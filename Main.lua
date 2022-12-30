@@ -2247,7 +2247,7 @@ function MOD:ReadRGBA(red, green, blue, alpha, default)
 	}
 
 	if default ~= nil then
-		default = MOD.ReadRGBA(unpack(default))
+		default = MOD:ReadRGBA(unpack(default))
 	else
 		default = output
 	end
@@ -2272,7 +2272,7 @@ function MOD:ReadRGB(r, g, b, default)
 	}
 
 	if default ~= nil then
-		default = MOD.ReadRGB(unpack(default))
+		default = MOD:ReadRGB(unpack(default))
 	else
 		default = output
 	end
