@@ -2237,3 +2237,59 @@ function MOD:UpdateCooldowns()
 		updateCooldowns = false
 	end
 end
+
+function MOD:ReadRGBA(red, green, blue, alpha, default)
+	local output = {
+		1,
+		1,
+		1,
+		1,
+	}
+
+	if default ~= nil then
+		default = MOD.ReadRGBA(unpack(default))
+	else
+		default = output
+	end
+
+	if red == nil or green == nil or blue == nil or alpha == nil then
+		return default
+	end
+
+	return {
+		red,
+		green,
+		blue,
+		alpha,
+	}
+end
+
+function MOD:ReadRGB(r, g, b, default)
+	local output = {
+		1,
+		1,
+		1,
+	}
+
+	if default ~= nil then
+		default = MOD.ReadRGB(unpack(default))
+	else
+		default = output
+	end
+
+	if red == nil or green == nil or blue == nil then
+		return default
+	end
+
+	return {
+		red,
+		green,
+		blue,
+	}
+end
+
+function MOD:SetTextColor(element, r, g, b, a)
+	local color = MOD:ReadRGBA(r, g, b, a)
+
+	element:SetTextColor(unpack(color))
+end

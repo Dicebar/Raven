@@ -2491,7 +2491,7 @@ MOD.OptionsTable = {
 									type = "color", order = 25, name = L["Color"], hasAlpha = false, width = "half",
 									get = function(info)
 										local t = MOD.db.global.Defaults.labelColor
-										if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.Defaults.labelColor
@@ -2561,7 +2561,7 @@ MOD.OptionsTable = {
 									type = "color", order = 25, name = L["Color"], hasAlpha = false, width = "half",
 									get = function(info)
 										local t = MOD.db.global.Defaults.timeColor
-										if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.Defaults.timeColor
@@ -2631,7 +2631,7 @@ MOD.OptionsTable = {
 									type = "color", order = 25, name = L["Color"], hasAlpha = false, width = "half",
 									get = function(info)
 										local t = MOD.db.global.Defaults.iconColor
-										if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.Defaults.iconColor
@@ -2701,7 +2701,7 @@ MOD.OptionsTable = {
 									desc = L["Set fill color for the panel."],
 									get = function(info)
 										local t = MOD.db.global.Defaults.backdropFill
-										if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.Defaults.backdropFill
@@ -2761,7 +2761,7 @@ MOD.OptionsTable = {
 									desc = L["Set color for the border."],
 									get = function(info)
 										local t = MOD.db.global.Defaults.backdropColor
-										if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.Defaults.backdropColor
@@ -2796,7 +2796,7 @@ MOD.OptionsTable = {
 									desc = L["Set color for the border."],
 									get = function(info)
 										local t = MOD.db.global.Defaults.borderColor
-										if t then return t.r, t.g, t.b, t.a else return 0, 0, 0, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0, 0, 0, 1})) else return 0, 0, 0, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.Defaults.borderColor
@@ -2904,7 +2904,7 @@ MOD.OptionsTable = {
 						ColorText = { type = "description", name = L["Bar Colors:"], order = 1, width = "half" },
 						NotificationColor = {
 							type = "color", order = 13, name = L["Notify"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultNotificationColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultNotificationColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultNotificationColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2913,7 +2913,7 @@ MOD.OptionsTable = {
 						},
 						BrokerColor = {
 							type = "color", order = 14, name = L["Broker"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultBrokerColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultBrokerColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultBrokerColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2922,7 +2922,7 @@ MOD.OptionsTable = {
 						},
 						ValueColor = {
 							type = "color", order = 15, name = L["Value"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultValueColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultValueColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultValueColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2931,7 +2931,7 @@ MOD.OptionsTable = {
 						},
 						BuffColor = {
 							type = "color", order = 16, name = L["Buff"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultBuffColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultBuffColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultBuffColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2940,7 +2940,7 @@ MOD.OptionsTable = {
 						},
 						DebuffColor = {
 							type = "color", order = 17, name = L["Debuff"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultDebuffColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultDebuffColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultDebuffColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2949,7 +2949,7 @@ MOD.OptionsTable = {
 						},
 						CooldownColor = {
 							type = "color", order = 18, name = L["Cooldown"], hasAlpha = false,
-							get = function(info) local t = MOD.db.global.DefaultCooldownColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultCooldownColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultCooldownColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2960,7 +2960,7 @@ MOD.OptionsTable = {
 						DebuffText = { type = "description", name = L["Special Colors:"], order = 36, width = "half" },
 						PoisonColor = {
 							type = "color", order = 40, name = L["Poison"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultPoisonColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultPoisonColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultPoisonColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2969,7 +2969,7 @@ MOD.OptionsTable = {
 						},
 						CurseColor = {
 							type = "color", order = 41, name = L["Curse"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultCurseColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultCurseColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultCurseColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2978,7 +2978,7 @@ MOD.OptionsTable = {
 						},
 						MagicColor = {
 							type = "color", order = 42, name = L["Magic"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultMagicColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultMagicColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultMagicColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2987,7 +2987,7 @@ MOD.OptionsTable = {
 						},
 						DiseaseColor = {
 							type = "color", order = 43, name = L["Disease"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultDiseaseColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultDiseaseColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultDiseaseColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -2996,7 +2996,7 @@ MOD.OptionsTable = {
 						},
 						EnrageColor = {
 							type = "color", order = 44, name = L["Enrage"], hasAlpha = false, width = "half",
-							get = function(info) local t = MOD.db.global.DefaultEnrageColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultEnrageColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultEnrageColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -3005,7 +3005,7 @@ MOD.OptionsTable = {
 						},
 						StealColor = {
 							type = "color", order = 45, name = L["Stealable"], hasAlpha = false,
-							get = function(info) local t = MOD.db.global.DefaultStealColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultStealColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultStealColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -3246,7 +3246,7 @@ MOD.OptionsTable = {
 							type = "color", order = 50, name = L["Border"], hasAlpha = false, width = "half",
 							disabled = function(info) return (Raven.frame.SetTemplate and MOD.db.global.TukuiSkin and MOD.db.global.TukuiIcon) end,
 							desc = L["Set default color for icon borders (displayed if None selected in Bar Color Scheme for Icon Border)."],
-							get = function(info) local t = MOD.db.global.DefaultBorderColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultBorderColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultBorderColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -3259,7 +3259,7 @@ MOD.OptionsTable = {
 									(Raven.frame.SetTemplate and MOD.db.global.TukuiSkin and MOD.db.global.TukuiIcon) or
 									not MOD.db.global.PixelPerfect or not MOD.db.global.HideBorder or not MOD.db.global.PixelIconBorder end,
 							desc = L["Set color for icon backdrop (displayed only if pixel icon borders are enabled)."],
-							get = function(info) local t = MOD.db.global.DefaultIconBackdropColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.DefaultIconBackdropColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.DefaultIconBackdropColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -3286,7 +3286,7 @@ MOD.OptionsTable = {
 						CenterColor = {
 							type = "color", order = 30, name = L["Center Line"], hasAlpha = false, width = "half",
 							desc = L["Set color for the overlay's center horizontal and vertical lines."],
-							get = function(info) local t = MOD.db.global.GridCenterColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.GridCenterColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.GridCenterColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -3296,7 +3296,7 @@ MOD.OptionsTable = {
 						LineColor = {
 							type = "color", order = 40, name = L["Other Lines"], hasAlpha = false, width = "half",
 							desc = L["Set color for the other overlay lines."],
-							get = function(info) local t = MOD.db.global.GridLineColor; return t.r, t.g, t.b, t.a end,
+							get = function(info) local t = MOD.db.global.GridLineColor; return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 							set = function(info, r, g, b, a)
 								local t = MOD.db.global.GridLineColor
 								t.r = r; t.g = g; t.b = b; t.a = a
@@ -3924,7 +3924,7 @@ MOD.OptionsTable = {
 									type = "color", order = 45, name = L["Color"], hasAlpha = false, width = "half",
 									get = function(info)
 										local t = MOD.db.global.EnemySpellCastAlerts.color
-										if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.EnemySpellCastAlerts.color
@@ -4127,7 +4127,7 @@ MOD.OptionsTable = {
 									type = "color", order = 45, name = L["Color"], hasAlpha = false, width = "half",
 									get = function(info)
 										local t = MOD.db.global.FriendSpellCastAlerts.color
-										if t then return t.r, t.g, t.b, t.a else return 0, 1, 0, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0 , 1, 0, 1})) else return 0, 1, 0, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.FriendSpellCastAlerts.color
@@ -4330,7 +4330,7 @@ MOD.OptionsTable = {
 									type = "color", order = 45, name = L["Color"], hasAlpha = false, width = "half",
 									get = function(info)
 										local t = MOD.db.global.EnemyBuffAlerts.color
-										if t then return t.r, t.g, t.b, t.a else return 1, 1, 0, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 1, 0, 1})) else return 1, 1, 0, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.EnemyBuffAlerts.color
@@ -4519,7 +4519,7 @@ MOD.OptionsTable = {
 									type = "color", order = 45, name = L["Color"], hasAlpha = false, width = "half",
 									get = function(info)
 										local t = MOD.db.global.FriendDebuffAlerts.color
-										if t then return t.r, t.g, t.b, t.a else return 1, 0, 1, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 1, 1})) else return 1, 0, 1, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = MOD.db.global.FriendDebuffAlerts.color
@@ -5626,7 +5626,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for combat text."],
 											disabled = function(info) return not GetBarGroupField("combatStart") end,
 											get = function(info)
-												local t = GetBarGroupField("combatColorStart"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+												local t = GetBarGroupField("combatColorStart"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("combatColorStart"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -5832,7 +5832,7 @@ MOD.OptionsTable = {
 											desc = L["Set bar color for when about to expire (set invisible opacity to disable color change)."],
 											disabled = function(info) return not GetBarGroupField("colorExpiring") end,
 											get = function(info)
-												local t = GetBarGroupField("expireColor"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+												local t = GetBarGroupField("expireColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("expireColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -5845,7 +5845,7 @@ MOD.OptionsTable = {
 											desc = L["Set label color for when bar is about to expire (set invisible opacity to disable color change)."],
 											disabled = function(info) return not GetBarGroupField("colorExpiring") end,
 											get = function(info)
-												local t = GetBarGroupField("expireLabelColor"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 0 end
+												local t = GetBarGroupField("expireLabelColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 0})) else return 1, 0, 0, 0 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("expireLabelColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -5858,7 +5858,7 @@ MOD.OptionsTable = {
 											desc = L["Set time color for when bar is about to expire (set invisible opacity to disable color change)."],
 											disabled = function(info) return not GetBarGroupField("colorExpiring") end,
 											get = function(info)
-												local t = GetBarGroupField("expireTimeColor"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 0 end
+												local t = GetBarGroupField("expireTimeColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 0})) else return 1, 0, 0, 0 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("expireTimeColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -5871,7 +5871,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for expire time tick (set invisible opacity to disable showing tick on bar)."],
 											disabled = function(info) return not GetBarGroupField("colorExpiring") end,
 											get = function(info)
-												local t = GetBarGroupField("tickColor"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 0 end
+												local t = GetBarGroupField("tickColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 0})) else return 1, 0, 0, 0 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("tickColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -5906,7 +5906,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for combat text."],
 											disabled = function(info) return not GetBarGroupField("expireMSBT") end,
 											get = function(info)
-												local t = GetBarGroupField("colorMSBT"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+												local t = GetBarGroupField("colorMSBT"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("colorMSBT"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -5992,7 +5992,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for combat text."],
 											disabled = function(info) return not GetBarGroupField("combatEnd") end,
 											get = function(info)
-												local t = GetBarGroupField("combatColorEnd"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+												local t = GetBarGroupField("combatColorEnd"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("combatColorEnd"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -6025,7 +6025,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for shine effects."],
 											hidden = function(info) return not GetBarGroupField("customizeSFX") end,
 											get = function(info)
-												local t = GetBarGroupField("shineColor"); if t then return t.r, t.g, t.b else return 1, 1, 1 end
+												local t = GetBarGroupField("shineColor"); if t then return unpack(MOD:ReadRGB(t.r, t.g, t.b)) else return 1, 1, 1 end
 											end,
 											set = function(info, r, g, b)
 												local t = GetBarGroupField("shineColor"); if t then t.r = r; t.g = g; t.b = b else
@@ -6038,7 +6038,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for sparkle effects."],
 											hidden = function(info) return not GetBarGroupField("customizeSFX") end,
 											get = function(info)
-												local t = GetBarGroupField("sparkleColor"); if t then return t.r, t.g, t.b else return 1, 1, 1 end
+												local t = GetBarGroupField("sparkleColor"); if t then return unpack(MOD:ReadRGB(t.r, t.g, t.b)) else return 1, 1, 1 end
 											end,
 											set = function(info, r, g, b)
 												local t = GetBarGroupField("sparkleColor"); if t then t.r = r; t.g = g; t.b = b else
@@ -6051,7 +6051,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for glow effects."],
 											hidden = function(info) return not GetBarGroupField("customizeSFX") end,
 											get = function(info)
-												local t = GetBarGroupField("glowColor"); if t then return t.r, t.g, t.b else return 1, 1, 1 end
+												local t = GetBarGroupField("glowColor"); if t then return unpack(MOD:ReadRGB(t.r, t.g, t.b)) else return 1, 1, 1 end
 											end,
 											set = function(info, r, g, b)
 												local t = GetBarGroupField("glowColor"); if t then t.r = r; t.g = g; t.b = b else
@@ -8066,7 +8066,7 @@ MOD.OptionsTable = {
 											desc = L["Set start color for the gradient."],
 											disabled = function(info) return not GetBarGroupField("segmentGradient") end,
 											get = function(info)
-												local t = GetBarGroupField("segmentGradientStartColor"); if t then return t.r, t.g, t.b else return 0, 1, 0 end
+												local t = GetBarGroupField("segmentGradientStartColor"); if t then return unpack(MOD:ReadRGB(t.r, t.g, t.b)) else return 0, 1, 0 end
 											end,
 											set = function(info, r, g, b)
 												local t = GetBarGroupField("segmentGradientStartColor"); if t then t.r = r; t.g = g; t.b = b else
@@ -8079,7 +8079,7 @@ MOD.OptionsTable = {
 											desc = L["Set end color for the gradient."],
 											disabled = function(info) return not GetBarGroupField("segmentGradient") end,
 											get = function(info)
-												local t = GetBarGroupField("segmentGradientEndColor"); if t then return t.r, t.g, t.b else return 1, 0, 0 end
+												local t = GetBarGroupField("segmentGradientEndColor"); if t then return unpack(MOD:ReadRGB(t.r, t.g, t.b, {1, 0, 0})) else return 1, 0, 0 end
 											end,
 											set = function(info, r, g, b)
 												local t = GetBarGroupField("segmentGradientEndColor"); if t then t.r = r; t.g = g; t.b = b else
@@ -8091,7 +8091,7 @@ MOD.OptionsTable = {
 											type = "color", order = 160, name = L["Border Color"], hasAlpha = true,
 											desc = L["Set color, including opacity, of the border around each segment."],
 											get = function(info)
-												local t = GetBarGroupField("segmentBorderColor"); if t then return t.r, t.g, t.b, t.a else return 0, 0, 0, 1 end
+												local t = GetBarGroupField("segmentBorderColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0, 0, 0, 1})) else return 0, 0, 0, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("segmentBorderColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -8175,7 +8175,7 @@ MOD.OptionsTable = {
 											type = "color", order = 27, name = L["Timeline Color"], hasAlpha = true,
 											desc = L["Set color for the timeline."],
 											get = function(info)
-												local t = GetBarGroupField("timelineColor"); if t then return t.r, t.g, t.b, t.a else return 0.5, 0.5, 0.5, 0.5 end
+												local t = GetBarGroupField("timelineColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0.5, 0.5, 0.5, 0.5})) else return 0.5, 0.5, 0.5, 0.5 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("timelineColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -8215,7 +8215,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for the border."],
 											get = function(info)
 												local t = GetBarGroupField("timelineBorderColor")
-												if t then return t.r, t.g, t.b, t.a else return 0, 0, 0, 1 end
+												if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0, 0, 0, 1})) else return 0, 0, 0, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("timelineBorderColor")
@@ -8347,7 +8347,7 @@ MOD.OptionsTable = {
 											type = "color", order = 50, name = L["Color"], hasAlpha = true, width = "half",
 											desc = L["Color for the stripe."],
 											get = function(info)
-												local t = GetBarGroupField("stripeColor"); if t then return t.r, t.g, t.b, t.a else return 0.5, 0.5, 0.5, 0.5 end
+												local t = GetBarGroupField("stripeColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0.5, 0.5, 0.5, 0.5})) else return 0.5, 0.5, 0.5, 0.5 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("stripeColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -8359,7 +8359,7 @@ MOD.OptionsTable = {
 											type = "color", order = 55, name = L["Alt Color"], hasAlpha = true, width = "half",
 											desc = L["Alternative color for the stripe that is used if color condition is true."],
 											get = function(info)
-												local t = GetBarGroupField("stripeAltColor"); if t then return t.r, t.g, t.b, t.a else return 0.5, 0.5, 0.5, 0.5 end
+												local t = GetBarGroupField("stripeAltColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0.5, 0.5, 0.5, 0.5})) else return 0.5, 0.5, 0.5, 0.5 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("stripeAltColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -8408,7 +8408,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for the border."],
 											get = function(info)
 												local t = GetBarGroupField("stripeBorderColor")
-												if t then return t.r, t.g, t.b, t.a else return 0, 0, 0, 1 end
+												if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0, 0, 0, 1})) else return 0, 0, 0, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("stripeBorderColor")
@@ -8897,7 +8897,7 @@ MOD.OptionsTable = {
 											disabled = function(info) return GetBarGroupField("useDefaultFontsAndTextures") end,
 											get = function(info)
 												local t = GetBarGroupField("labelColor")
-												if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+												if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("labelColor")
@@ -8976,7 +8976,7 @@ MOD.OptionsTable = {
 											disabled = function(info) return GetBarGroupField("useDefaultFontsAndTextures") end,
 											get = function(info)
 												local t = GetBarGroupField("timeColor")
-												if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+												if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("timeColor")
@@ -9055,7 +9055,7 @@ MOD.OptionsTable = {
 											disabled = function(info) return GetBarGroupField("useDefaultFontsAndTextures") end,
 											get = function(info)
 												local t = GetBarGroupField("iconColor")
-												if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+												if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("iconColor")
@@ -9134,7 +9134,7 @@ MOD.OptionsTable = {
 											desc = L["Set fill color for the panel."],
 											get = function(info)
 												local t = GetBarGroupField("backdropFill")
-												if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+												if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("backdropFill")
@@ -9198,7 +9198,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for the border."],
 											get = function(info)
 												local t = GetBarGroupField("backdropColor")
-												if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+												if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("backdropColor")
@@ -9237,7 +9237,7 @@ MOD.OptionsTable = {
 											desc = L["Set color for the border."],
 											get = function(info)
 												local t = GetBarGroupField("borderColor")
-												if t then return t.r, t.g, t.b, t.a else return 0, 0, 0, 1 end
+												if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0, 0, 0, 1})) else return 0, 0, 0, 1 end
 											end,
 											set = function(info, r, g, b, a)
 												local t = GetBarGroupField("borderColor")
@@ -9381,7 +9381,7 @@ MOD.OptionsTable = {
 									type = "color", order = 13, name = L["Notify"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("notificationColor") or MOD.db.global.DefaultNotificationColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("notificationColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9393,7 +9393,7 @@ MOD.OptionsTable = {
 									type = "color", order = 14, name = L["Broker"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("brokerColor") or MOD.db.global.DefaultBrokerColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("brokerColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9405,7 +9405,7 @@ MOD.OptionsTable = {
 									type = "color", order = 15, name = L["Value"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("valueColor") or MOD.db.global.DefaultValueColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("valueColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9417,7 +9417,7 @@ MOD.OptionsTable = {
 									type = "color", order = 16, name = L["Buff"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("buffColor") or MOD.db.global.DefaultBuffColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("buffColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9429,7 +9429,7 @@ MOD.OptionsTable = {
 									type = "color", order = 17, name = L["Debuff"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("debuffColor") or MOD.db.global.DefaultDebuffColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("debuffColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9441,7 +9441,7 @@ MOD.OptionsTable = {
 									type = "color", order = 18, name = L["Cooldown"], hasAlpha = false,
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("cooldownColor") or MOD.db.global.DefaultCooldownColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("cooldownColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9455,7 +9455,7 @@ MOD.OptionsTable = {
 									type = "color", order = 30, name = L["Poison"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("poisonColor") or MOD.db.global.DefaultPoisonColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("poisonColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9467,7 +9467,7 @@ MOD.OptionsTable = {
 									type = "color", order = 31, name = L["Curse"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("curseColor") or MOD.db.global.DefaultCurseColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("curseColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9479,7 +9479,7 @@ MOD.OptionsTable = {
 									type = "color", order = 32, name = L["Magic"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("magicColor") or MOD.db.global.DefaultMagicColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("magicColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9491,7 +9491,7 @@ MOD.OptionsTable = {
 									type = "color", order = 33, name = L["Disease"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("diseaseColor") or MOD.db.global.DefaultDiseaseColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("diseaseColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9503,7 +9503,7 @@ MOD.OptionsTable = {
 									type = "color", order = 34, name = L["Enrage"], hasAlpha = false, width = "half",
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("enrageColor") or MOD.db.global.DefaultEnrageColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("enrageColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9515,7 +9515,7 @@ MOD.OptionsTable = {
 									type = "color", order = 35, name = L["Stealable"], hasAlpha = false,
 									disabled = function(info) return GetBarGroupField("useDefaultColors") end,
 									get = function(info) local t = GetBarGroupField("stealColor") or MOD.db.global.DefaultStealColor
-										return t.r, t.g, t.b, t.a end,
+										return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("stealColor")
 										if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -9546,7 +9546,7 @@ MOD.OptionsTable = {
 									disabled = function(info) return GetBarGroupField("barColors") ~= "Custom" end,
 									get = function(info)
 										local t = GetBarGroupField("fgColor")
-										if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("fgColor")
@@ -9586,7 +9586,7 @@ MOD.OptionsTable = {
 									disabled = function(info) return GetBarGroupField("bgColors") ~= "Custom" end,
 									get = function(info)
 										local t = GetBarGroupField("bgColor")
-										if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("bgColor")
@@ -9614,7 +9614,7 @@ MOD.OptionsTable = {
 									disabled = function(info) return GetBarGroupField("iconColors") ~= "Custom" end,
 									get = function(info)
 										local t = GetBarGroupField("iconBorderColor")
-										if t then return t.r, t.g, t.b, t.a else return 1, 1, 1, 1 end
+										if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a)) else return 1, 1, 1, 1 end
 									end,
 									set = function(info, r, g, b, a)
 										local t = GetBarGroupField("iconBorderColor")
@@ -13879,7 +13879,7 @@ MOD.barOptions = {
 					local c = bar.color
 					if bar.barType ~= "Notification" then c = MOD:GetSpellColorForBar(bar) end -- special case for notifications
 					if not c then return 1, 1, 1, 1 end -- better than nothing
-					return c.r, c.g, c.b, c.a
+					return unpack(MOD:ReadRGBA(c.r, c.g, c.b, c.a))
 				end,
 				set = function(info, r, g, b, a)
 					local bar = GetBarEntry(info)
@@ -14585,7 +14585,7 @@ MOD.barOptions = {
 						desc = L["Set color for combat text."],
 						disabled = function(info) return not GetBarField(info, "combatStart") end,
 						get = function(info)
-							local t = GetBarField(info, "combatColorStart"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+							local t = GetBarField(info, "combatColorStart"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "combatColorStart"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -14710,7 +14710,7 @@ MOD.barOptions = {
 							local t = nil
 							if GetBarField(info, "spellExpireColors") then t = MOD:GetExpireColor(GetBarField(info, "action"), GetBarField(info, "spellID")) end
 							if not t then t = GetBarField(info, "expireColor") end
-							if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+							if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "expireColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -14724,7 +14724,7 @@ MOD.barOptions = {
 						desc = L["Set label color for when bar is about to expire (set invisible opacity to disable color change)."],
 						disabled = function(info) return not GetBarField(info, "colorExpiring") end,
 						get = function(info)
-							local t = GetBarField(info, "expireLabelColor"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 0 end
+							local t = GetBarField(info, "expireLabelColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 0})) else return 1, 0, 0, 0 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "expireLabelColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -14737,7 +14737,7 @@ MOD.barOptions = {
 						desc = L["Set time color for when bar is about to expire (set invisible opacity to disable color change)."],
 						disabled = function(info) return not GetBarField(info, "colorExpiring") end,
 						get = function(info)
-							local t = GetBarField(info, "expireTimeColor"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 0 end
+							local t = GetBarField(info, "expireTimeColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 0})) else return 1, 0, 0, 0 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "expireTimeColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -14750,7 +14750,7 @@ MOD.barOptions = {
 						desc = L["Set color for expire time tick (set invisible opacity to disable showing tick on bar)."],
 						disabled = function(info) return not GetBarField(info, "colorExpiring") end,
 						get = function(info)
-							local t = GetBarField(info, "tickColor"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 0 end
+							local t = GetBarField(info, "tickColor"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 0})) else return 1, 0, 0, 0 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "tickColor"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -14785,7 +14785,7 @@ MOD.barOptions = {
 						desc = L["Set color for combat text."],
 						disabled = function(info) return not GetBarField(info, "expireMSBT") end,
 						get = function(info)
-							local t = GetBarField(info, "colorMSBT"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+							local t = GetBarField(info, "colorMSBT"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "colorMSBT"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -14871,7 +14871,7 @@ MOD.barOptions = {
 						desc = L["Set color for combat text."],
 						disabled = function(info) return not GetBarField(info, "combatEnd") end,
 						get = function(info)
-							local t = GetBarField(info, "combatColorEnd"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+							local t = GetBarField(info, "combatColorEnd"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "combatColorEnd"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -14955,7 +14955,7 @@ MOD.barOptions = {
 						desc = L["Set color for combat text."],
 						disabled = function(info) return not GetBarField(info, "combatReady") end,
 						get = function(info)
-							local t = GetBarField(info, "combatColorReady"); if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 1 end
+							local t = GetBarField(info, "combatColorReady"); if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 1})) else return 1, 0, 0, 1 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "combatColorReady"); if t then t.r = r; t.g = g; t.b = b; t.a = a else
@@ -15120,7 +15120,7 @@ MOD.barOptions = {
 						disabled = function(info) return not GetBarField(info, "colorBar") end,
 						get = function(info)
 							local t = GetBarField(info, "colorTrue")
-							if t then return t.r, t.g, t.b, t.a else return 0, 1, 0, 0 end
+							if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {0, 1, 0, 0})) else return 0, 1, 0, 0 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "colorTrue")
@@ -15135,7 +15135,7 @@ MOD.barOptions = {
 						disabled = function(info) return not GetBarField(info, "colorBar") end,
 						get = function(info)
 							local t = GetBarField(info, "colorFalse")
-							if t then return t.r, t.g, t.b, t.a else return 1, 0, 0, 0 end
+							if t then return unpack(MOD:ReadRGBA(t.r, t.g, t.b, t.a, {1, 0, 0, 0})) else return 1, 0, 0, 0 end
 						end,
 						set = function(info, r, g, b, a)
 							local t = GetBarField(info, "colorFalse")
@@ -15170,7 +15170,7 @@ MOD.barOptions = {
 						desc = L["Set color for shine effects."],
 						hidden = function(info) return not GetBarField(info, "customizeSFX") end,
 						get = function(info)
-							local t = GetBarField(info, "shineColor"); if t then return t.r, t.g, t.b else return 1, 1, 1 end
+							local t = GetBarField(info, "shineColor"); if t then return unpack(MOD:ReadRGB(t.r, t.g, t.b)) else return 1, 1, 1 end
 						end,
 						set = function(info, r, g, b)
 							local t = GetBarField(info, "shineColor"); if t then t.r = r; t.g = g; t.b = b else
@@ -15183,7 +15183,7 @@ MOD.barOptions = {
 						desc = L["Set color for sparkle effects."],
 						hidden = function(info) return not GetBarField(info, "customizeSFX") end,
 						get = function(info)
-							local t = GetBarField(info, "sparkleColor"); if t then return t.r, t.g, t.b else return 1, 1, 1 end
+							local t = GetBarField(info, "sparkleColor"); if t then return unpack(MOD:ReadRGB(t.r, t.g, t.b)) else return 1, 1, 1 end
 						end,
 						set = function(info, r, g, b)
 							local t = GetBarField(info, "sparkleColor"); if t then t.r = r; t.g = g; t.b = b else
@@ -15196,7 +15196,7 @@ MOD.barOptions = {
 						desc = L["Set color for glow effects."],
 						hidden = function(info) return not GetBarField(info, "customizeSFX") end,
 						get = function(info)
-							local t = GetBarField(info, "glowColor"); if t then return t.r, t.g, t.b else return 1, 1, 1 end
+							local t = GetBarField(info, "glowColor"); if t then return unpack(MOD:ReadRGB(t.r, t.g, t.b)) else return 1, 1, 1 end
 						end,
 						set = function(info, r, g, b)
 							local t = GetBarField(info, "glowColor"); if t then t.r = r; t.g = g; t.b = b else
