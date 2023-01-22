@@ -1435,16 +1435,23 @@ end
 -- Initialize tooltip to be used for determining weapon buffs
 -- This code is based on the Pitbull implementation
 function MOD:InitializeBuffTooltip()
-	bufftooltip = CreateFrame("GameTooltip", "Raven_Weaponbuff_Tooltip", UIParent)
-	bufftooltip:SetOwner(UIParent, "ANCHOR_NONE")
-	local fs = bufftooltip:CreateFontString()
-	fs:SetFontObject(_G.GameFontNormal)
-	bufftooltip.tooltiplines = {} -- cache of font strings for each line in the tooltip
+	local tipName = "Raven_Weaponbuff_Tooltip"
+	bufftooltip = bufftooltip or CreateFrame("GameTooltip", tipName, nil)
+	bufftooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	bufftooltip.tooltiplines = bufftooltip.tooltiplines or {} -- cache of font strings for each line in the tooltip
+
 	for i = 1, 30 do
-		local ls = bufftooltip:CreateFontString()
-		ls:SetFontObject(_G.GameFontNormal)
-		bufftooltip:AddFontStrings(ls, fs)
-		bufftooltip.tooltiplines[i] = ls
+		local leftText, rightText = _G[tipName.."TextLeft"..i], _G[tipName.."TextRight"..i]
+		if leftText then
+			bufftooltip.tooltiplines[i] = leftText
+		else
+			local ls = bufftooltip:CreateFontString(tipName.."TextLeft"..i, "ARTWORK", "GameTooltipText")
+			local rs = bufftooltip:CreateFontString(tipName.."TextRight"..i, "ARTWORK", "GameTooltipText")
+			ls:SetFontObject(GameTooltipText)
+			rs:SetFontObject(GameTooltipText)
+			bufftooltip.tooltiplines[i] = ls
+			bufftooltip:AddFontStrings(bufftooltip.tooltiplines[i], rs)
+		end
 	end
 end
 
@@ -1452,8 +1459,8 @@ end
 function MOD:GetBuffTooltip()
 	bufftooltip:ClearLines()
 
-	if not bufftooltip:IsOwned(UIParent) then
-		bufftooltip:SetOwner(UIParent, "ANCHOR_NONE")
+	if not bufftooltip:IsOwned(WorldFrame) then
+		bufftooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 	end
 
 	return bufftooltip

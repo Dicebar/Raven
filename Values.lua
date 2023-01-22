@@ -751,7 +751,7 @@ function MOD:InitializeValues()
 	startMoney = GetMoney()
 	startTime = GetTime()
 	scanTooltip = CreateFrame("GameTooltip", "Puffin_ScanTip", nil, "GameTooltipTemplate")
-	scanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+	scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 	mirrorIcons = { BREATH = GetSpellTexture(5697), DEATH = GetSpellTexture(10848), EXHAUSTION = GetSpellTexture(9256), FEIGNDEATH = GetSpellTexture(5384) }
 	iconXP = GetItemIcon(122270)
 	iconRested = GetItemIcon(10940)
