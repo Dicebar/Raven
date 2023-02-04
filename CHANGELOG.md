@@ -1,3 +1,9 @@
+# 26 January 2023
+- Optimized Weapon tooltip Scan for Temporary Weapon Enchants
+
+# 14 January 2023
+- Fixed bug causing Slam's cooldown, when combined with the Storm of Swords talent, to not be testable for conditions.
+
 # 28 December 2022
 
 - Fixed spelling for global cooldown in options menu, causing errors for some users

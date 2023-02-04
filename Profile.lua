@@ -245,7 +245,13 @@ function MOD:SetCooldownDefaults()
 							chs[spellID] = charges
 						else
 							local duration = GetSpellBaseCooldown(spellID) -- duration is in milliseconds
-							if duration and duration > 1500 then cds[spellID] = duration / 1000 end -- don't include spells with global cooldowns
+
+							if duration and duration > 1500 then
+								cds[spellID] = duration / 1000
+							elseif spellID == 1464 then
+								-- Exception for https://github.com/Dicebar/Raven/issues/29, needs an automated solution
+								cds[spellID] = 12
+							end -- don't include spells with global cooldowns
 						end
 						local ls = cls[name] -- doesn't account for "FLYOUT" spellbook entries, but not an issue currently
 						if ls then -- found a lockout spell so add fields for the spell book index plus localized text

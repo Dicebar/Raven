@@ -119,7 +119,7 @@ local throttleTime = 0 -- secondary throttle that resets once per second
 local throttleCounter = 0 -- throttle counter included for testing
 local throttleTracker = 0 -- throttle max count seen included for testing
 local now = 0 -- refresh time value set at combat log and update events
-local bufftooltip = nil -- used to store tooltip for scanning weapon buffs
+local buffTooltip = nil -- used to store tooltip for scanning weapon buffs
 local mhLastBuff = nil -- saves name of most recent main hand weapon buff
 local ohLastBuff = nil -- saves name of most recent off hand weapon buff
 local iconGCD = nil -- icon for global cooldown
@@ -1435,28 +1435,35 @@ end
 -- Initialize tooltip to be used for determining weapon buffs
 -- This code is based on the Pitbull implementation
 function MOD:InitializeBuffTooltip()
-	bufftooltip = CreateFrame("GameTooltip", "Raven_Weaponbuff_Tooltip", UIParent)
-	bufftooltip:SetOwner(UIParent, "ANCHOR_NONE")
-	local fs = bufftooltip:CreateFontString()
-	fs:SetFontObject(_G.GameFontNormal)
-	bufftooltip.tooltiplines = {} -- cache of font strings for each line in the tooltip
+	--buffTooltip = CreateFrame("GameTooltip", "Raven_Weaponbuff_Tooltip", UIParent)
+	local tipName = "Raven_Weaponbuff_Tooltip"
+	buffTooltip = buffTooltip or CreateFrame("GameTooltip", tipName, nil)
+	buffTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	buffTooltip.tooltipLines = buffTooltip.tooltipLines or {} -- cache of font strings for each line in the tooltip
 	for i = 1, 30 do
-		local ls = bufftooltip:CreateFontString()
-		ls:SetFontObject(_G.GameFontNormal)
-		bufftooltip:AddFontStrings(ls, fs)
-		bufftooltip.tooltiplines[i] = ls
+		local leftText, rightText = _G[tipName.."TextLeft"..i], _G[tipName.."TextRight"..i]
+		if leftText then
+			buffTooltip.tooltipLines[i] = leftText
+		else
+			local ls = buffTooltip:CreateFontString(tipName.."TextLeft"..i, "ARTWORK", "GameTooltipText")
+			local rs = buffTooltip:CreateFontString(tipName.."TextRight"..i, "ARTWORK", "GameTooltipText")
+			ls:SetFontObject(GameTooltipText)
+			rs:SetFontObject(GameTooltipText)
+			buffTooltip.tooltipLines[i] = ls
+			buffTooltip:AddFontStrings(buffTooltip.tooltipLines[i], rs)
+		end
 	end
 end
 
 -- Return the temporary table for storing buff tooltips
 function MOD:GetBuffTooltip()
-	bufftooltip:ClearLines()
+	buffTooltip:ClearLines()
 
-	if not bufftooltip:IsOwned(UIParent) then
-		bufftooltip:SetOwner(UIParent, "ANCHOR_NONE")
+	if not buffTooltip:IsOwned(WorldFrame) then
+		buffTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 	end
 
-	return bufftooltip
+	return buffTooltip
 end
 
 -- No easy way to get this info, so scan item slot info for mainhand and offhand weapons using a tooltip
@@ -1491,7 +1498,7 @@ local function GetWeaponBuffNameOld(weaponSlot)
 	tt:SetInventoryItem("player", weaponSlot)
 
 	for i = 1, 30 do
-		local text = tt.tooltiplines[i]:GetText()
+		local text = tt.tooltipLines[i]:GetText()
 		if text then
 			local name = text:match("^(.+) %(%d+ [^$)]+%)$") -- extract up to left paren if match weapon buff format
 			if name then

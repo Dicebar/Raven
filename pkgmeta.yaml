@@ -3,6 +3,7 @@ enable-nolib-creation: no
 
 ignore:
  - .pkgmeta
+ - .github
  - Readme.txt
  - FAQ.txt
  - Raven_Classic.toc
