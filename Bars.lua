@@ -1685,7 +1685,7 @@ local function DetectNewDebuffs(unit, n, aura, isBuff, bp, vbp, bg)
 	local isPoison, isCurse, isMagic, isDisease = (aura[4] == "Poison"), (aura[4] == "Curse"), (aura[4] == "Magic"), (aura[4] == "Disease")
 	local isStackable = aura[3] > 0
 	local isOther = not isBoss and not isEffect and not isPoison and not isCurse and not isMagic and not isDisease
-			and not isDispel and not isInflict and not isNPC and not isVehicle
+			and not isDispel and not isInflict and not isNPC and not isVehicle and not isStackable
 	local isMine = (tc == "player")
 	local id, gname = aura[20], aura[21]
 	local checkAll = (unit == "all")
