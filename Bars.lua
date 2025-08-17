@@ -1596,17 +1596,18 @@ local function DetectNewBuffs(unit, n, aura, isBuff, bp, vbp, bg)
 	local isMine = (tc == "player")
 	local isTabard = isMine and icon and (icon == tabardIcon) -- test if on player, same icon as equipped tabard, not cancellable
 	local isCastable = aura[17] and not isWeapon
+	local isStackable = aura[3] > 0
 	local isOther = not isStealable and not isCastable and not isNPC and not isVehicle and not isMagic and not isEffect and
-			not isWeapon and not isBoss and not isEnrage and not isTracking and not isResource and not isMount and not isTabard
+			not isWeapon and not isBoss and not isEnrage and not isTracking and not isResource and not isMount and not isTabard and not isStackable
 	local id, gname = nil, nil
 	local checkAll = (unit == "all")
 	if checkAll then id = aura[20]; gname = aura[21] end -- these fields are only valid if unit == "all"
-	local includeTypes = not bp.detectBuffTypes or (bp.detectStealable and isStealable) or (bp.detectCastable and isCastable)
+	local includeTypes = not bp.detectBuffTypes or (bp.detectStealable and isStealable) or (bp.detectCastable and isCastable) or (bp.detectStackable and isStackable)
 			or (bp.detectNPCBuffs and isNPC) or (bCcuffs and isVehicle) or (bp.detectBossBuffs and isBoss) or (bp.detectEnrageBuffs and isEnrage)
 			or (bp.detectMagicBuffs and isMagic) or (bp.detectEffectBuffs and isEffect) or (bp.detectAlertBuffs and isAlert) or (bp.detectWeaponBuffs and isWeapon)
 			or (bp.detectTracking and isTracking) or (bp.detectResources and isResource) or (bp.detectMountBuffs and isMount)
 			or (bp.detectTabardBuffs and isTabard) or (bp.detectMinionBuffs and isMinion) or (bp.detectOtherBuffs and isOther)
-	local excludeTypes = not bp.excludeBuffTypes or not ((bp.excludeStealable and isStealable) or (bp.excludeCastable and isCastable)
+	local excludeTypes = not bp.excludeBuffTypes or not ((bp.excludeStealable and isStealable) or (bp.excludeCastable and isCastable) or (bp.excludeStackable and isStackable)
 			or (bp.excludeNPCBuffs and isNPC) or (bp.excludeVehicleBuffs and isVehicle) or (bp.excludeBossBuffs and isBoss) or (bp.excludeEnrageBuffs and isEnrage)
 			or (bp.excludeMagicBuffs and isMagic) or (bp.excludeEffectBuffs and isEffect) or (bp.excludeAlertBuffs and isAlert) or (bp.excludeWeaponBuffs and isWeapon)
 			or (bp.excludeTracking and isTracking) or (bp.excludeResources and isResource) or (bp.excludeMountBuffs and isMount)
@@ -1616,7 +1617,6 @@ local function DetectNewBuffs(unit, n, aura, isBuff, bp, vbp, bg)
 			(not checkAll and not (bp.noPlayerBuffs and UnitIsUnit(unit, "player")) and not (bp.noPetBuffs and UnitIsUnit(unit, "pet"))
 					and not (bp.noTargetBuffs and UnitIsUnit(unit, "target")) and not (bp.noFocusBuffs and UnitIsUnit(unit, "focus")) and
 					MOD:CheckCastBy(tc, bp.detectBuffsCastBy))) and CheckTimeAndDuration(bp, aura[2], aura[5]) and includeTypes and excludeTypes then
-
 		local b, tag = detectedBar, aura[9]
 		table.wipe(b); b.enableBar = true; b.sorder = 0; b.action = n; b.spellID = spellID; b.barType = "Buff"
 		if unit == "all" then
@@ -1683,16 +1683,17 @@ local function DetectNewDebuffs(unit, n, aura, isBuff, bp, vbp, bg)
 	local isEffect = (tt == "effect")
 	local isAlert = (tt == "alert")
 	local isPoison, isCurse, isMagic, isDisease = (aura[4] == "Poison"), (aura[4] == "Curse"), (aura[4] == "Magic"), (aura[4] == "Disease")
+	local isStackable = aura[3] > 0
 	local isOther = not isBoss and not isEffect and not isPoison and not isCurse and not isMagic and not isDisease
 			and not isDispel and not isInflict and not isNPC and not isVehicle
 	local isMine = (tc == "player")
 	local id, gname = aura[20], aura[21]
 	local checkAll = (unit == "all")
-	local includeTypes = not bp.filterDebuffTypes or (bp.detectDispellable and isDispel) or (bp.detectInflictable and isInflict)
+	local includeTypes = not bp.filterDebuffTypes or (bp.detectDispellable and isDispel) or (bp.detectInflictable and isInflict) or (bp.detectMultiStack and isStackable)
 			or (bp.detectNPCDebuffs and isNPC) or (bp.detectVehicleDebuffs and isVehicle) or (bp.detectBossDebuffs and isBoss)
 			or (bp.detectPoison and isPoison) or (bp.detectCurse and isCurse) or (bp.detectMagic and isMagic) or (bp.detectDisease and isDisease)
 			or (bp.detectEffectDebuffs and isEffect) or (bp.detectAlertDebuffs and isAlert) or (bp.detectOtherDebuffs and isOther)
-	local excludeTypes = not bp.excludeDebuffTypes or not ((bp.excludeDispellable and isDispel) or (bp.excludeInflictable and isInflict)
+	local excludeTypes = not bp.excludeDebuffTypes or not ((bp.excludeDispellable and isDispel) or (bp.excludeInflictable and isInflict) or (bp.excludeMultiStack and isStackable)
 			or (bp.excludeNPCDebuffs and isNPC) or (bp.excludeVehicleDebuffs and isVehicle) or (bp.excludeBossDebuffs and isBoss)
 			or (bp.excludePoison and isPoison) or (bp.excludeCurse and isCurse) or (bp.excludeMagic and isMagic) or (bp.excludeDisease and isDisease)
 			or (bp.excludeEffectDebuffs and isEffect) or (bp.excludeAlertDebuffs and isAlert) or (bp.excludeOtherDebuffs and isOther))

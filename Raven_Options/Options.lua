@@ -6480,6 +6480,13 @@ MOD.OptionsTable = {
 									get = function(info) return GetBarGroupField("detectCastable") end,
 									set = function(info, value) SetBarGroupField("detectCastable", value) end,
 								},
+								Stackable = {
+									type = "toggle", order = 15, name = L["Stackable"],
+									disabled = function(info) return not GetBarGroupField("detectBuffTypes") or not GetBarGroupField("detectBuffs") end,
+									desc = L['Include buffs that able to stack.'],
+									get = function(info) return GetBarGroupField("detectStackable") end,
+									set = function(info, value) SetBarGroupField("detectStackable", value) end,
+								},
 								Stealable = {
 									type = "toggle", order = 20, name = L["Stealable"],
 									disabled = function(info) return not GetBarGroupField("detectBuffTypes") or not GetBarGroupField("detectBuffs") end,
@@ -6604,6 +6611,13 @@ MOD.OptionsTable = {
 									desc = L['Exclude buffs that the player can cast.'],
 									get = function(info) return GetBarGroupField("excludeCastable") end,
 									set = function(info, value) SetBarGroupField("excludeCastable", value) end,
+								},
+								Stackable = {
+									type = "toggle", order = 15, name = L["Stackable"],
+									disabled = function(info) return not GetBarGroupField("excludeBuffTypes") or not GetBarGroupField("detectBuffs") end,
+									desc = L['Exclude buffs that able to stack.'],
+									get = function(info) return GetBarGroupField("excludeStackable") end,
+									set = function(info, value) SetBarGroupField("excludeStackable", value) end,
 								},
 								Stealable = {
 									type = "toggle", order = 20, name = L["Stealable"],
@@ -7167,6 +7181,13 @@ MOD.OptionsTable = {
 									get = function(info) return GetBarGroupField("detectInflictable") end,
 									set = function(info, value) SetBarGroupField("detectInflictable", value) end,
 								},
+								Stackable = {
+									type = "toggle", order = 15, name = L["Stackable"],
+									disabled = function(info) return not GetBarGroupField("filterDebuffTypes") end,
+									desc = L['Include debuffs that able to stack.'],
+									get = function(info) return GetBarGroupField("detectMultiStack") end,
+									set = function(info, value) SetBarGroupField("detectMultiStack", value) end,
+								},
 								Dispellable = {
 									type = "toggle", order = 20, name = L["Dispellable"],
 									disabled = function(info) return not GetBarGroupField("filterDebuffTypes") end,
@@ -7262,6 +7283,13 @@ MOD.OptionsTable = {
 									desc = L['Exclude debuffs that the player can cast.'],
 									get = function(info) return GetBarGroupField("excludeInflictable") end,
 									set = function(info, value) SetBarGroupField("excludeInflictable", value) end,
+								},
+								Stackable = {
+									type = "toggle", order = 15, name = L["Stackable"],
+									disabled = function(info) return not GetBarGroupField("excludeDebuffTypes") end,
+									desc = L['Exclude debuffs that able to stack.'],
+									get = function(info) return GetBarGroupField("excludeMultiStack") end,
+									set = function(info, value) SetBarGroupField("excludeMultiStack", value) end,
 								},
 								Dispellable = {
 									type = "toggle", order = 20, name = L["Dispellable"],
