@@ -53,7 +53,7 @@ MOD.BarGroupTemplate = { -- default bar group settings
 	segmentFadePartial = false, segmentShrinkWidth = false, segmentShrinkHeight = false, segmentGradient = false, segmentGradientAll = false,
 	disableBGSFX = false, customizeSFX = false,	shineColor = false, sparkleColor = false, glowColor = false,
 	expireFGBG = false, flashPeriod = 1.2, flashPercent = 50, combatTextExcludesBG = false,
-	shineStart = false, sparkleStart, pulseStart = false, glowStart = false, flashStart = false, desatStart = false,
+	shineStart = false, sparkleStart = false, pulseStart = false, glowStart = false, flashStart = false, desatStart = false,
 	shineExpiring = false, sparkleExpiring = false, pulseExpiring = false, glowExpiring = false, flashExpiring = false, desatExpiring = false,
 	startEffectTime = 5, endEffectTime = 5, delayTime = 0,
 	combatStart = false, combatCriticalStart = false, expireMSBT = false, criticalMSBT = false,
