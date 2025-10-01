@@ -121,7 +121,7 @@ local throttleTime = 0 -- secondary throttle that resets once per second
 local throttleCounter = 0 -- throttle counter included for testing
 local throttleTracker = 0 -- throttle max count seen included for testing
 local now = 0 -- refresh time value set at combat log and update events
-local buffTooltip = nil -- used to store tooltip for scanning weapon buffs
+local scanningTooltip = nil -- used to store tooltip for scanning
 local mainHandLastBuff = nil -- saves name of most recent main hand weapon buff
 local offHandLastBuff = nil -- saves name of most recent off hand weapon buff
 local rangedLastBuff = nil -- saves name of most recent ranged weapon buff
@@ -878,7 +878,7 @@ function MOD:OnEnable()
 	MOD.Nest_Initialize() -- initialize the graphics module
 	MOD:InitializeConditions() -- initialize condition evaluation module
 	MOD:InitializeValues() -- initialize functions used for value bars
-	MOD:BAG_UPDATE("OnEnable") -- initialize bag cooldowns
+	MOD:BAG_UPDATE_DELAYED("OnEnable") -- initialize bag cooldowns
 	MOD:UNIT_INVENTORY_CHANGED("OnEnable", "player") -- initialize inventory cooldowns
 
 	-- Create a frame so that updates can be registered
@@ -893,7 +893,7 @@ function MOD:OnEnable()
 	self:RegisterEvent("UNIT_TARGET")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("SPELLS_CHANGED")
-	self:RegisterEvent("BAG_UPDATE")
+	self:RegisterEvent("BAG_UPDATE_DELAYED")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	self:RegisterEvent("RAID_TARGET_UPDATE", CheckRaidTargets)
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", CheckMouseoverRaidTarget)
@@ -976,7 +976,7 @@ function MOD:PLAYER_ENTERING_WORLD()
 			tagBuffs[k] = {}; tagDebuffs[k] = {}; cacheBuffs[k] = {}; cacheDebuffs[k] = {}
 		end
 		updateCooldowns = true -- start tracking cooldowns
-		MOD:InitializeBuffTooltip() -- initialize tooltip used to monitor weapon buffs
+		MOD:InitializeScanTooltip() -- initialize tooltip used to monitor weapon buffs
 		InitializeIcons() -- cache special purpose icons
 		MOD:InitializeOverlays() -- initialize overlays used to cancel player buffs
 		MOD:InitializeInCombatBar() -- initialize special bar for cancelling buffs in combat
@@ -1045,7 +1045,7 @@ function MOD:UNIT_INVENTORY_CHANGED(e, unit)
 end
 
 -- Event called when content of the player's bags changes
-function MOD:BAG_UPDATE(e)
+function MOD:BAG_UPDATE_DELAYED(e)
 	TriggerCooldownUpdate()
 	table.wipe(bagCooldowns) -- update bag item cooldown table
 	for bag = 0, NUM_BAG_SLOTS do
@@ -1471,36 +1471,38 @@ end
 
 -- Initialize tooltip to be used for determining weapon buffs
 -- This code is based on the Pitbull implementation
-function MOD:InitializeBuffTooltip()
-	--buffTooltip = CreateFrame("GameTooltip", "Raven_Weaponbuff_Tooltip", UIParent)
-	local tipName = "Raven_Weaponbuff_Tooltip"
-	buffTooltip = buffTooltip or CreateFrame("GameTooltip", tipName, nil)
-	buffTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
-	buffTooltip.tooltipLines = buffTooltip.tooltipLines or {} -- cache of font strings for each line in the tooltip
+function MOD:InitializeScanTooltip()
+	local tipName = "Raven_Scanning_Tooltip"
+	scanningTooltip = scanningTooltip or CreateFrame("GameTooltip", tipName, nil, "GameTooltipTemplate")
+	scanningTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	scanningTooltip.tooltipLines = scanningTooltip.tooltipLines or {} -- cache of font strings for each line in the tooltip
 	for i = 1, 30 do
 		local leftText, rightText = _G[tipName.."TextLeft"..i], _G[tipName.."TextRight"..i]
 		if leftText then
-			buffTooltip.tooltipLines[i] = leftText
+			scanningTooltip.tooltipLines[i] = leftText
 		else
-			local ls = buffTooltip:CreateFontString(tipName.."TextLeft"..i, "ARTWORK", "GameTooltipText")
-			local rs = buffTooltip:CreateFontString(tipName.."TextRight"..i, "ARTWORK", "GameTooltipText")
+			local ls = scanningTooltip:CreateFontString(tipName.."TextLeft"..i, "ARTWORK", "GameTooltipText")
+			local rs = scanningTooltip:CreateFontString(tipName.."TextRight"..i, "ARTWORK", "GameTooltipText")
 			ls:SetFontObject(GameTooltipText)
 			rs:SetFontObject(GameTooltipText)
-			buffTooltip.tooltipLines[i] = ls
-			buffTooltip:AddFontStrings(buffTooltip.tooltipLines[i], rs)
+			scanningTooltip.tooltipLines[i] = ls
+			scanningTooltip:AddFontStrings(scanningTooltip.tooltipLines[i], rs)
 		end
 	end
 end
 
 -- Return the temporary table for storing buff tooltips
-function MOD:GetBuffTooltip()
-	buffTooltip:ClearLines()
+function MOD:GetScanTooltip()
+	if not scanningTooltip then
+		scanningTooltip = MOD:InitializeScanTooltip()
+	end
+	scanningTooltip:ClearLines()
 
-	if not buffTooltip:IsOwned(WorldFrame) then
-		buffTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	if not scanningTooltip:IsOwned(WorldFrame) then
+		scanningTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 	end
 
-	return buffTooltip
+	return scanningTooltip
 end
 
 -- No easy way to get this info, so scan item slot info for mainhand and offhand weapons using a tooltip
@@ -1527,7 +1529,7 @@ local function GetWeaponBuffName(weaponSlot)
 end
 
 local function GetWeaponBuffNameOld(weaponSlot)
-	local tt = MOD:GetBuffTooltip()
+	local tt = MOD:GetScanTooltip()
 	tt:SetInventoryItem("player", weaponSlot)
 
 	for i = 1, 30 do

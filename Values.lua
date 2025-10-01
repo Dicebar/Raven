@@ -135,6 +135,7 @@ local function GetTimerText(value) return GetFormattedText("t", value, 1) end
 
 local function GetDurability()
 	local durability, repairCost, totalCurrent, totalMaximum, itemCount = 1, 0, 0, 0, 0
+	scanTooltip = scanTooltip or MOD:GetScanTooltip()
 	for slotID = 1, 18 do
 		if GetInventoryItemID("player", slotID) then
 			local currentDurability, maximumDurability = GetInventoryItemDurability(slotID)
@@ -750,8 +751,6 @@ function MOD:InitializeValues()
 	end
 	startMoney = GetMoney()
 	startTime = GetTime()
-	scanTooltip = CreateFrame("GameTooltip", "Puffin_ScanTip", nil, "GameTooltipTemplate")
-	scanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
 	mirrorIcons = { BREATH = SHIM:GetSpellTexture(5697), DEATH = SHIM:GetSpellTexture(10848), EXHAUSTION = SHIM:GetSpellTexture(9256), FEIGNDEATH = SHIM:GetSpellTexture(5384) }
 	iconXP = SHIM:GetItemIconByID(122270)
 	iconRested = SHIM:GetItemIconByID(10940)

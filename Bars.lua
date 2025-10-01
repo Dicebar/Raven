@@ -1014,34 +1014,58 @@ end
 -- Return a number found in a tooltip for auras and cooldowns
 function MOD:GetTooltipNumber(ttType, ttID, ttUnit, ttOffset)
 	if not ttOffset or ttOffset > #numberPatterns then ttOffset = 1 end -- determine offset into numberPatterns
-	local tt = nil
-	if ttType == "buff" then
-		tt = C_TooltipInfo.GetUnitAura(ttUnit, ttID, "HELPFUL") -- fill in the tooltip for the buff
-	elseif ttType == "debuff" then
-		tt = C_TooltipInfo.GetUnitAura(ttUnit, ttID, "HARMFUL") -- fill in the tooltip for the debuff
-	elseif (ttType == "spell id") or (ttType == "internal") or (ttType == "alert") then
-		tt = C_TooltipInfo.GetSpellByID(ttID)
-	elseif (tt == "item id") then
-		tt = C_TooltipInfo.GetItemByID(ttID)
-	elseif (ttType == "inventory") or (ttType == "weapon") then
-		tt = C_TooltipInfo.GetInventoryItem("player", ttID)
-	end
-	if tt then
-		local pattern = numberPatterns[ttOffset]
-		local t = ""
-
-		for i = 1, 30 do
-			if tt.lines[i] and tt.lines[i].leftText then
-				local s = tt.lines[i].leftText
-				if s then t = t .. s else break end
-			else
-				break
-			end
+	local pattern = numberPatterns[ttOffset]
+	local t = ""
+	if C_TooltipInfo then -- modern clients
+		local tt = nil
+		if ttType == "buff" then
+			tt = C_TooltipInfo.GetUnitAura(ttUnit, ttID, "HELPFUL") -- fill in the tooltip for the buff
+		elseif ttType == "debuff" then
+			tt = C_TooltipInfo.GetUnitAura(ttUnit, ttID, "HARMFUL") -- fill in the tooltip for the debuff
+		elseif (ttType == "spell id") or (ttType == "internal") or (ttType == "alert") then
+			tt = C_TooltipInfo.GetSpellByID(ttID)
+		elseif (ttType == "item id") then
+			tt = C_TooltipInfo.GetItemByID(ttID)
+		elseif (ttType == "inventory") or (ttType == "weapon") then
+			tt = C_TooltipInfo.GetInventoryItem("player", ttID)
 		end
-
-		t = string.gsub(uncolor(t), ",", "") -- remove escape sequences and commas since they impact conversion of numbers
-
-		return string.match(t, pattern) -- extract number from the tooltip, if one exists for the specified offset
+		if tt then
+			for i = 1, 30 do
+				if tt.lines[i] and tt.lines[i].leftText then
+					local s = tt.lines[i].leftText
+					if s then t = t .. s else break end
+				else
+					break
+				end
+			end
+			t = string.gsub(uncolor(t), ",", "") -- remove escape sequences and commas since they impact conversion of numbers
+			return string.match(t, pattern) -- extract number from the tooltip, if one exists for the specified offset
+		end
+	else -- classic / fallback
+		local tt = MOD:GetScanTooltip()
+		if tt then
+			if ttType == "buff" then
+				tt:SetUnitAura(ttUnit, ttID, "HELPFUL")
+			elseif ttType == "debuff" then
+				tt:SetUnitAura(ttUnit, ttID, "HARMFUL")
+			elseif (ttType == "spell id") or (ttType == "internal") or (ttType == "alert") then
+				tt:SetSpellByID(ttID)
+			elseif (ttType == "item id") then
+				tt:SetItemByID(ttID)
+			elseif (ttType == "inventory") or (ttType == "weapon") then
+				tt:SetInventoryItem("player", ttID)
+			end
+			for i = 1, 30 do
+				local s = tt.tooltipLines[i]:GetText()
+				if s then
+					t = t .. s
+				else
+					break
+				end
+			end
+			t = string.gsub(uncolor(t), ",", "") -- remove escape sequences and commas since they impact conversion of numbers
+			return string.match(t, pattern) -- extract number from the tooltip, if one exists for the specified offset
+		end
 	end
 
 	return nil
