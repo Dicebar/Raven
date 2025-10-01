@@ -8,7 +8,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Raven")
 local valueFunctions, colorFunctions
 local mirrorIcons
 local iconXP, iconMail, iconCurrency, iconClock, iconLatency, iconFramerate, iconMap, iconMapX, iconMapY, iconArrow, iconAzerite
-local iconLevel, iconHealth, iconPower, iconHeals, iconAbsorb, iconStagger, iconThreat, iconDurability, iconCombat, iconRune, iconRested, iconResting
+local iconLevel, iconHealth, iconCombo, iconPower, iconHeals, iconAbsorb, iconStagger, iconThreat, iconDurability, iconCombat, iconRune, iconRested, iconResting
 local iconChi, iconArcaneCharge, iconSoulShard, iconHonor, iconHonorHorde, iconHonorAlliance, iconReputation, iconClassification
 local directionTable = { "S", "SSE", "SE", "ESE", "E", "ENE", "NE", "NNE", "N", "NNW", "NW", "WNW", "W", "WSW", "SW", "SSW" }
 local rc = { r = 1, g = 0, b = 0 }
@@ -39,7 +39,7 @@ local function ColorPower(power, token, altR, altG, altB)
 	if token then
 		local c = PowerBarColor[token]
 		if c then return c.r, c.g, c.b end
-	elseif altR and alrG and altB then
+	elseif altR and altG and altB then
 		return altR, altG, altB
 	elseif power then
 		local c = PowerBarColor[power]

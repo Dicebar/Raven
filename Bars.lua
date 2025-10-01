@@ -833,7 +833,7 @@ local function Bar_OnEnter(frame, bgName, barName, ttanchor)
 
 	if tt == "broker" then
 		if type(db) == "table" then
-			if db.tooltip and type(db.tooltip) == "table" and type(db.tooltip.SetText) == "function" and type(dp.tooltip.Show) == "function" then
+			if db.tooltip and type(db.tooltip) == "table" and type(db.tooltip.SetText) == "function" and type(db.tooltip.Show) == "function" then
 				Bar_AnchorTooltip(frame, db.tooltip)
 				if db.tooltiptext then db.tooltip:SetText(db.tooltiptext) end
 				db.tooltip:Show()
@@ -872,7 +872,7 @@ local function Bar_OnLeave(frame, bgName, barName, ttanchor)
 			end
 			if type(db.OnLeave) == "function" then
 				db.OnLeave(frame)
-			elseif db.tooltip and type(db.tooltip) == "table" and type(dp.tooltip.Hide) == "function" then
+			elseif db.tooltip and type(db.tooltip) == "table" and type(db.tooltip.Hide) == "function" then
 				db.tooltip:Hide()
 			else
 				GameTooltip:Hide()
@@ -1602,7 +1602,7 @@ local function DetectNewBuffs(unit, n, aura, isBuff, bp, vbp, bg)
 	local checkAll = (unit == "all")
 	if checkAll then id = aura[20]; gname = aura[21] end -- these fields are only valid if unit == "all"
 	local includeTypes = not bp.detectBuffTypes or (bp.detectStealable and isStealable) or (bp.detectCastable and isCastable)
-			or (bp.detectNPCBuffs and isNPC) or (bCcuffs and isVehicle) or (bp.detectBossBuffs and isBoss) or (bp.detectEnrageBuffs and isEnrage)
+			or (bp.detectNPCBuffs and isNPC) or (bp.detectVehicleBuffs and isVehicle) or (bp.detectBossBuffs and isBoss) or (bp.detectEnrageBuffs and isEnrage)
 			or (bp.detectMagicBuffs and isMagic) or (bp.detectEffectBuffs and isEffect) or (bp.detectAlertBuffs and isAlert) or (bp.detectWeaponBuffs and isWeapon)
 			or (bp.detectTracking and isTracking) or (bp.detectResources and isResource) or (bp.detectMountBuffs and isMount)
 			or (bp.detectTabardBuffs and isTabard) or (bp.detectMinionBuffs and isMinion) or (bp.detectOtherBuffs and isOther)
@@ -1845,6 +1845,7 @@ local function DetectNewCooldowns(n, cd, bp, vbp, bg)
 	if MOD:CheckCastBy(cd[7], bp.detectCooldownsBy) and CheckCooldownType(cd, bp) and CheckTimeAndDuration(bp, cd[1], cd[4]) then
 		local b = detectedBar
 		local label = MOD:GetLabel(n, cd[8])
+		local tt = cd[5]
 		if (tt == "alert") then b.barColor = cd[10] if cd[11] then label = cd[11] end end
 		table.wipe(b); b.enableBar = true; b.sorder = 0
 		b.action = n; b.spellID = cd[8]; b.barType = "Cooldown"; b.barLabel = label; b.uniqueID = "Cooldown"; b.listID = listID; b.group = nil

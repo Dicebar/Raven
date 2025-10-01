@@ -865,7 +865,7 @@ local function CheckMouseoverRaidTarget() CheckRaidTarget("mouseover"); CheckRai
 function MOD:GetRaidTarget(id) for k, v in pairs(raidTargets) do if v == id then return k end end return nil end
 
 -- When UI Scale changes need to recalculate pixel perfect settings and force a complete update
-function UIScaleChanged() updateUIScale = true end
+local function UIScaleChanged() updateUIScale = true end
 
 -- Event called when addon is enabled
 function MOD:OnEnable()
@@ -1077,29 +1077,29 @@ local function InitializeTalents()
 	table.wipe(MOD.talents);
 	table.wipe(MOD.talentList)
 
-	activeConfigID = C_ClassTalents.GetActiveConfigID()
+	local activeConfigID = C_ClassTalents.GetActiveConfigID()
 	if (activeConfigID) then
-		configInfo = C_Traits.GetConfigInfo(activeConfigID);
+		local configInfo = C_Traits.GetConfigInfo(activeConfigID);
 
 		local select = 1
 		for _, treeID in pairs(configInfo.treeIDs) do
-			nodes = C_Traits.GetTreeNodes(treeID)
+			local nodes = C_Traits.GetTreeNodes(treeID)
 
 			for _, nodeID in pairs(nodes) do
-				nodeInfo = C_Traits.GetNodeInfo(activeConfigID, nodeID)
+				local nodeInfo = C_Traits.GetNodeInfo(activeConfigID, nodeID)
 
 				for _,entryID in pairs(nodeInfo.entryIDs) do
-					entryInfo = C_Traits.GetEntryInfo(activeConfigID, entryID)
+					local entryInfo = C_Traits.GetEntryInfo(activeConfigID, entryID)
                     if not entryInfo.definitionID then
                         break
                     end
 
-                    definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
+                    local definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
                     if not definitionInfo.spellID then
                         break
                     end
 
-                    name, rank, icon = SHIM:GetSpellInfo(definitionInfo.spellID)
+                    local name, rank, icon = SHIM:GetSpellInfo(definitionInfo.spellID)
                     if name then
                         local talentActive
 
