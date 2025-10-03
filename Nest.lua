@@ -338,8 +338,16 @@ local function ReleaseFaderEffect(bar)
 	if anim then anim:Stop() end
 end
 
+local function FlashEffectAlphaOnUpdate(anim,elapsed)
+	local bar = anim.bar
+	if not bar then return end
+	-- function to get current alpha for all flashing bars
+	local newAlpha = MOD.Nest_FlashAlpha(bar.alpha,bar.minAlpha,bar.flashPeriod)
+	bar.frame:SetAlpha(newAlpha)
+end
+
 -- Flash effect to change bar alpha in a noticeable way
-local function FlashEffect(bar, maxAlpha, minAlpha, period)
+local function FlashEffect(bar)
 	local anim = bar.frame.flasher
 	if not anim then
 		anim = bar.frame:CreateAnimationGroup()
@@ -347,12 +355,12 @@ local function FlashEffect(bar, maxAlpha, minAlpha, period)
 		local a = anim:CreateAnimation("Animation") -- use animation to trigger associated OnUpdate script
 		a:SetDuration(1); a:SetOrder(1) -- this is done so that flashing bars can be synchronized
 		bar.frame.flasher = anim
+		anim.bar = bar
 	end
 
-	if anim.maxAlpha ~= maxAlpha or anim.minAlpha ~= minAlpha or anim.flashPeriod ~= period then
-		local FlashAlpha = MOD.Nest_FlashAlpha -- function to get current alpha for all flashing bars
-		anim:SetScript("OnUpdate", function() bar.frame:SetAlpha(FlashAlpha(maxAlpha, minAlpha, period)) end)
-		anim.maxAlpha = maxAlpha; anim.minAlpha = minAlpha; anim.flashPeriod = period
+	if anim.maxAlpha ~= bar.alpha or anim.minAlpha ~= bar.minAlpha or anim.flashPeriod ~= bar.flashPeriod then
+		anim:SetScript("OnUpdate", FlashEffectAlphaOnUpdate)
+		anim.maxAlpha = bar.alpha; anim.minAlpha = bar.minAlpha; anim.flashPeriod = bar.flashPeriod
 	end
 
 	if not anim:IsPlaying() then anim:Stop(); anim:Play() end
@@ -2218,6 +2226,7 @@ local function Bar_UpdateSettings(bg, bar, config)
 	if bar.glow then GlowEffect(bar, bat.glowColor) else ReleaseGlowEffect(bar) end -- enable or disable glow effect
 
 	local alpha = bar.alpha or 1 -- adjust by bar alpha
+	bar.alpha = alpha
 	local fade = true
 	if bat.header and bag.headerGaps then alpha = 0; fade = false end -- header bars can be made to disappear to create gaps
 
@@ -2225,7 +2234,9 @@ local function Bar_UpdateSettings(bg, bar, config)
 		local minAlpha
 		local pct = bat.flashPercent
 		if pct and (pct >= 0) and (pct <= 100) then minAlpha = alpha * pct / 100 else minAlpha = alpha / 2 end
-		FlashEffect(bar, alpha, minAlpha, bat.flashPeriod or 1.2)
+		bar.flashPeriod = bat.flashPeriod or 1.2
+		bar.minAlpha = minAlpha
+		FlashEffect(bar)
 	else
 		ReleaseFlashEffect(bar)
 		FaderEffect(bar, alpha, fade)
@@ -2682,11 +2693,11 @@ end
 
 -- Update pixel perfect scaling settings
 function MOD.Nest_UpdatePixelScale(displayReport)
-	pixelWidth, pixelHeight = GetPhysicalScreenSize() -- size in pixels of display in full screen, otherwise window size in pixels
-	pixelScale = GetScreenHeight() / pixelHeight -- figure out how big virtual pixels are versus screen pixels
-	pixelPerfect = (not MOD.db.global.TukuiSkin and MOD.db.global.PixelPerfect) or (MOD.db.global.TukuiSkin and MOD.db.global.TukuiScale)
-
 	if MOD.db.global.AdjustUIScale then -- option to adjust "UIscale" for optimized pixel perfect alignment on monitor
+		pixelWidth, pixelHeight = GetPhysicalScreenSize() -- size in pixels of display in full screen, otherwise window size in pixels
+		pixelScale = GetScreenHeight() / pixelHeight -- figure out how big virtual pixels are versus screen pixels
+		pixelPerfect = (not MOD.db.global.TukuiSkin and MOD.db.global.PixelPerfect) or (MOD.db.global.TukuiSkin and MOD.db.global.TukuiScale)
+
 		local oscale = GetCVar("uiScale")
 		local pscale = 768 / pixelHeight
 		local x = MOD.db.global.SetUIScale

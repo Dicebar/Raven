@@ -8,7 +8,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Raven")
 local valueFunctions, colorFunctions
 local mirrorIcons
 local iconXP, iconMail, iconCurrency, iconClock, iconLatency, iconFramerate, iconMap, iconMapX, iconMapY, iconArrow, iconAzerite
-local iconLevel, iconHealth, iconPower, iconHeals, iconAbsorb, iconStagger, iconThreat, iconDurability, iconCombat, iconRune, iconRested, iconResting
+local iconLevel, iconHealth, iconCombo, iconPower, iconHeals, iconAbsorb, iconStagger, iconThreat, iconDurability, iconCombat, iconRune, iconRested, iconResting
 local iconChi, iconArcaneCharge, iconSoulShard, iconHonor, iconHonorHorde, iconHonorAlliance, iconReputation, iconClassification
 local directionTable = { "S", "SSE", "SE", "ESE", "E", "ENE", "NE", "NNE", "N", "NNW", "NW", "WNW", "W", "WSW", "SW", "SSW" }
 local rc = { r = 1, g = 0, b = 0 }
@@ -39,7 +39,7 @@ local function ColorPower(power, token, altR, altG, altB)
 	if token then
 		local c = PowerBarColor[token]
 		if c then return c.r, c.g, c.b end
-	elseif altR and alrG and altB then
+	elseif altR and altG and altB then
 		return altR, altG, altB
 	elseif power then
 		local c = PowerBarColor[power]
@@ -135,6 +135,7 @@ local function GetTimerText(value) return GetFormattedText("t", value, 1) end
 
 local function GetDurability()
 	local durability, repairCost, totalCurrent, totalMaximum, itemCount = 1, 0, 0, 0, 0
+	scanTooltip = scanTooltip or MOD:GetScanTooltip()
 	for slotID = 1, 18 do
 		if GetInventoryItemID("player", slotID) then
 			local currentDurability, maximumDurability = GetInventoryItemDurability(slotID)
@@ -750,8 +751,6 @@ function MOD:InitializeValues()
 	end
 	startMoney = GetMoney()
 	startTime = GetTime()
-	scanTooltip = CreateFrame("GameTooltip", "Puffin_ScanTip", nil, "GameTooltipTemplate")
-	scanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
 	mirrorIcons = { BREATH = SHIM:GetSpellTexture(5697), DEATH = SHIM:GetSpellTexture(10848), EXHAUSTION = SHIM:GetSpellTexture(9256), FEIGNDEATH = SHIM:GetSpellTexture(5384) }
 	iconXP = SHIM:GetItemIconByID(122270)
 	iconRested = SHIM:GetItemIconByID(10940)

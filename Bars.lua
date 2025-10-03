@@ -53,7 +53,7 @@ MOD.BarGroupTemplate = { -- default bar group settings
 	segmentFadePartial = false, segmentShrinkWidth = false, segmentShrinkHeight = false, segmentGradient = false, segmentGradientAll = false,
 	disableBGSFX = false, customizeSFX = false,	shineColor = false, sparkleColor = false, glowColor = false,
 	expireFGBG = false, flashPeriod = 1.2, flashPercent = 50, combatTextExcludesBG = false,
-	shineStart = false, sparkleStart, pulseStart = false, glowStart = false, flashStart = false, desatStart = false,
+	shineStart = false, sparkleStart = false, pulseStart = false, glowStart = false, flashStart = false, desatStart = false,
 	shineExpiring = false, sparkleExpiring = false, pulseExpiring = false, glowExpiring = false, flashExpiring = false, desatExpiring = false,
 	startEffectTime = 5, endEffectTime = 5, delayTime = 0,
 	combatStart = false, combatCriticalStart = false, expireMSBT = false, criticalMSBT = false,
@@ -548,19 +548,19 @@ end
 -- Set an entry in a bar group cache block
 local function SetCache(bg, block, name, value)
 	if not bg.cache then bg.cache = {} end
-	if not bg.cache.block then bg.cache.block = {} end
-	bg.cache.block[name] = value
+	if not bg.cache[block] then bg.cache[block] = {} end
+	bg.cache[block][name] = value
 end
 
 -- Get a value from a bar group cache block
 local function GetCache(bg, block, name)
-	if not bg.cache or not bg.cache.block then return nil end
-	return bg.cache.block[name]
+	if not bg.cache or not bg.cache[block] then return nil end
+	return bg.cache[block][name]
 end
 
 -- Reset a bar group cache block
 local function ResetCache(bg, block)
-	if bg.cache and bg.cache.block then table.wipe(bg.cache.block) end
+	if bg.cache and bg.cache[block] then table.wipe(bg.cache[block]) end
 end
 
 -- Update a bar group with the current values in the profile
@@ -833,7 +833,7 @@ local function Bar_OnEnter(frame, bgName, barName, ttanchor)
 
 	if tt == "broker" then
 		if type(db) == "table" then
-			if db.tooltip and type(db.tooltip) == "table" and type(db.tooltip.SetText) == "function" and type(dp.tooltip.Show) == "function" then
+			if db.tooltip and type(db.tooltip) == "table" and type(db.tooltip.SetText) == "function" and type(db.tooltip.Show) == "function" then
 				Bar_AnchorTooltip(frame, db.tooltip)
 				if db.tooltiptext then db.tooltip:SetText(db.tooltiptext) end
 				db.tooltip:Show()
@@ -872,7 +872,7 @@ local function Bar_OnLeave(frame, bgName, barName, ttanchor)
 			end
 			if type(db.OnLeave) == "function" then
 				db.OnLeave(frame)
-			elseif db.tooltip and type(db.tooltip) == "table" and type(dp.tooltip.Hide) == "function" then
+			elseif db.tooltip and type(db.tooltip) == "table" and type(db.tooltip.Hide) == "function" then
 				db.tooltip:Hide()
 			else
 				GameTooltip:Hide()
@@ -1014,34 +1014,58 @@ end
 -- Return a number found in a tooltip for auras and cooldowns
 function MOD:GetTooltipNumber(ttType, ttID, ttUnit, ttOffset)
 	if not ttOffset or ttOffset > #numberPatterns then ttOffset = 1 end -- determine offset into numberPatterns
-	local tt = nil
-	if ttType == "buff" then
-		tt = C_TooltipInfo.GetUnitAura(ttUnit, ttID, "HELPFUL") -- fill in the tooltip for the buff
-	elseif ttType == "debuff" then
-		tt = C_TooltipInfo.GetUnitAura(ttUnit, ttID, "HARMFUL") -- fill in the tooltip for the debuff
-	elseif (ttType == "spell id") or (ttType == "internal") or (ttType == "alert") then
-		tt = C_TooltipInfo.GetSpellByID(ttID)
-	elseif (tt == "item id") then
-		tt = C_TooltipInfo.GetItemByID(ttID)
-	elseif (ttType == "inventory") or (ttType == "weapon") then
-		tt = C_TooltipInfo.GetInventoryItem("player", ttID)
-	end
-	if tt then
-		local pattern = numberPatterns[ttOffset]
-		local t = ""
-
-		for i = 1, 30 do
-			if tt.lines[i] and tt.lines[i].leftText then
-				local s = tt.lines[i].leftText
-				if s then t = t .. s else break end
-			else
-				break
-			end
+	local pattern = numberPatterns[ttOffset]
+	local t = ""
+	if C_TooltipInfo then -- modern clients
+		local tt = nil
+		if ttType == "buff" then
+			tt = C_TooltipInfo.GetUnitAura(ttUnit, ttID, "HELPFUL") -- fill in the tooltip for the buff
+		elseif ttType == "debuff" then
+			tt = C_TooltipInfo.GetUnitAura(ttUnit, ttID, "HARMFUL") -- fill in the tooltip for the debuff
+		elseif (ttType == "spell id") or (ttType == "internal") or (ttType == "alert") then
+			tt = C_TooltipInfo.GetSpellByID(ttID)
+		elseif (ttType == "item id") then
+			tt = C_TooltipInfo.GetItemByID(ttID)
+		elseif (ttType == "inventory") or (ttType == "weapon") then
+			tt = C_TooltipInfo.GetInventoryItem("player", ttID)
 		end
-
-		t = string.gsub(uncolor(t), ",", "") -- remove escape sequences and commas since they impact conversion of numbers
-
-		return string.match(t, pattern) -- extract number from the tooltip, if one exists for the specified offset
+		if tt then
+			for i = 1, 30 do
+				if tt.lines[i] and tt.lines[i].leftText then
+					local s = tt.lines[i].leftText
+					if s then t = t .. s else break end
+				else
+					break
+				end
+			end
+			t = string.gsub(uncolor(t), ",", "") -- remove escape sequences and commas since they impact conversion of numbers
+			return string.match(t, pattern) -- extract number from the tooltip, if one exists for the specified offset
+		end
+	else -- classic / fallback
+		local tt = MOD:GetScanTooltip()
+		if tt then
+			if ttType == "buff" then
+				tt:SetUnitAura(ttUnit, ttID, "HELPFUL")
+			elseif ttType == "debuff" then
+				tt:SetUnitAura(ttUnit, ttID, "HARMFUL")
+			elseif (ttType == "spell id") or (ttType == "internal") or (ttType == "alert") then
+				tt:SetSpellByID(ttID)
+			elseif (ttType == "item id") then
+				tt:SetItemByID(ttID)
+			elseif (ttType == "inventory") or (ttType == "weapon") then
+				tt:SetInventoryItem("player", ttID)
+			end
+			for i = 1, 30 do
+				local s = tt.tooltipLines[i]:GetText()
+				if s then
+					t = t .. s
+				else
+					break
+				end
+			end
+			t = string.gsub(uncolor(t), ",", "") -- remove escape sequences and commas since they impact conversion of numbers
+			return string.match(t, pattern) -- extract number from the tooltip, if one exists for the specified offset
+		end
 	end
 
 	return nil
@@ -1602,7 +1626,7 @@ local function DetectNewBuffs(unit, n, aura, isBuff, bp, vbp, bg)
 	local checkAll = (unit == "all")
 	if checkAll then id = aura[20]; gname = aura[21] end -- these fields are only valid if unit == "all"
 	local includeTypes = not bp.detectBuffTypes or (bp.detectStealable and isStealable) or (bp.detectCastable and isCastable)
-			or (bp.detectNPCBuffs and isNPC) or (bCcuffs and isVehicle) or (bp.detectBossBuffs and isBoss) or (bp.detectEnrageBuffs and isEnrage)
+			or (bp.detectNPCBuffs and isNPC) or (bp.detectVehicleBuffs and isVehicle) or (bp.detectBossBuffs and isBoss) or (bp.detectEnrageBuffs and isEnrage)
 			or (bp.detectMagicBuffs and isMagic) or (bp.detectEffectBuffs and isEffect) or (bp.detectAlertBuffs and isAlert) or (bp.detectWeaponBuffs and isWeapon)
 			or (bp.detectTracking and isTracking) or (bp.detectResources and isResource) or (bp.detectMountBuffs and isMount)
 			or (bp.detectTabardBuffs and isTabard) or (bp.detectMinionBuffs and isMinion) or (bp.detectOtherBuffs and isOther)
@@ -1845,6 +1869,7 @@ local function DetectNewCooldowns(n, cd, bp, vbp, bg)
 	if MOD:CheckCastBy(cd[7], bp.detectCooldownsBy) and CheckCooldownType(cd, bp) and CheckTimeAndDuration(bp, cd[1], cd[4]) then
 		local b = detectedBar
 		local label = MOD:GetLabel(n, cd[8])
+		local tt = cd[5]
 		if (tt == "alert") then b.barColor = cd[10] if cd[11] then label = cd[11] end end
 		table.wipe(b); b.enableBar = true; b.sorder = 0
 		b.action = n; b.spellID = cd[8]; b.barType = "Cooldown"; b.barLabel = label; b.uniqueID = "Cooldown"; b.listID = listID; b.group = nil

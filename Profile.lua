@@ -248,6 +248,7 @@ function MOD:SetCooldownDefaults()
                 if stype == "SPELL" then -- in this case, id is not always the spell id despite what online docs say
                     local name, _, icon, _, _, _, spellID = SHIM:GetSpellInfo(id)
                     if overrideID ~= nil then
+                    	local overridingName,overridingIcon
                         overridingName, _, overridingIcon, _, _, _, overrideID = SHIM:GetSpellInfo(overrideID)
                         MOD.spellOverrides[name] = overridingName
                         bst[overridingName] = overrideID

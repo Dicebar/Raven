@@ -85,9 +85,22 @@ local suppressTime = nil -- set when addon code is loaded
 local updateCooldowns = false -- set when actionbar or inventory slot cooldown starts or stops
 local units = {} -- list of units to track
 local mainUnits = { "player", "pet", "target", "focus", "targettarget", "focustarget", "pettarget", "mouseover" } -- ordered list of main units
-local partyUnits = { "party1", "party2", "party3", "party4" } -- optional party units
 local bossUnits = { "boss1", "boss2", "boss3", "boss4", "boss5" } -- optional boss units
 local arenaUnits = { "arena1", "arena2", "arena3", "arena4", "arena5" } -- optional arena units
+local partyUnits, partyUnitPets, partyUnitTargets = {},{},{} -- optional party units
+local raidUnits, raidUnitPets, raidUnitTargets = {},{},{}
+do -- precache unit tokens
+	for i=1,MAX_PARTY_MEMBERS do
+		partyUnits[i] = "party"..i
+		partyUnitPets[i] = "partypet"..i
+		partyUnitTargets[i] = "party"..i.."target"
+	end
+	for i=1,MAX_RAID_MEMBERS do
+		raidUnits[i] = "raid"..i
+		raidUnitPets[i] = "raidpet"..i
+		raidUnitTargets[i] = "raid"..i.."target"
+	end
+end
 local nameplateUnits = {} -- cache of 40 nameplate unit ids
 local eventUnits = { "targettarget", "focustarget", "pettarget", "mouseover" } -- can't count on events for these units
 local tagUnits = { player = true, target = true, focus = true, pet = true, targettarget = true, focustarget = true, pettarget = true, mouseover = true } -- for hash tag generation
@@ -121,7 +134,7 @@ local throttleTime = 0 -- secondary throttle that resets once per second
 local throttleCounter = 0 -- throttle counter included for testing
 local throttleTracker = 0 -- throttle max count seen included for testing
 local now = 0 -- refresh time value set at combat log and update events
-local buffTooltip = nil -- used to store tooltip for scanning weapon buffs
+local scanningTooltip = nil -- used to store tooltip for scanning
 local mainHandLastBuff = nil -- saves name of most recent main hand weapon buff
 local offHandLastBuff = nil -- saves name of most recent off hand weapon buff
 local rangedLastBuff = nil -- saves name of most recent ranged weapon buff
@@ -197,10 +210,12 @@ end
 function MOD.UnitAuraSpellName(unit, spellName, filter)
 	local name, icon, count, btype, duration, expire, caster, isStealable, nameplateShowSelf, spellID, apply, boss
 	if type(spellName) == "string" then -- sanity check only being called with a spell name
-		for i = 1, 100 do
+		local i = 1
+		repeat
 			name, icon, count, btype, duration, expire, caster, isStealable, nameplateShowSelf, spellID, apply, boss = MOD:GetAuraData(unit, i, filter)
 			if name == spellName then break end
-		end
+			i = i + 1
+		until not name
 	end
 	return name, icon, count, btype, duration, expire, caster, isStealable, nameplateShowSelf, spellID, boss, apply
 end
@@ -510,22 +525,21 @@ local function GetUnitIDFromGUID(guid)
 	local uid = cacheUnits[guid] -- look up the guid in the cache and if it is there make sure it is still valid and then return it
 	if uid then if guid == UnitGUID(uid) then return uid else uid = nil end end
 	for _, unit in ipairs(units) do uid = CheckUnitIDs(unit, guid); if uid then break end end -- first check primary units
-	local inRaid = IsInRaid()
-	if not uid and not inRaid then -- check party, party pet, and party target units
-		for i = 1, GetNumGroupMembers() do
-			uid = CheckUnitIDs("party"..i, guid); if uid then break end
-			uid = CheckUnitIDs("partypet"..i, guid); if uid then break end
-			uid = CheckUnitIDs("party"..i.."target", guid); if uid then break end
+	local inRaid, inGroup = IsInRaid(), IsInGroup()
+	if not uid then
+		if inRaid then
+			for i = 1, MAX_RAID_MEMBERS do
+				uid = CheckUnitIDs(raidUnits[i], guid); if uid then break end
+				uid = CheckUnitIDs(raidUnitPets[i], guid); if uid then break end
+				uid = CheckUnitIDs(raidUnitTargets[i], guid); if uid then break end
+			end
+		elseif inGroup then
+			for i = 1, MAX_PARTY_MEMBERS do
+				uid = CheckUnitIDs(partyUnits[i], guid); if uid then break end
+				uid = CheckUnitIDs(partyUnitPets[i], guid); if uid then break end
+				uid = CheckUnitIDs(partyUnitTargets[i], guid); if uid then break end
+			end
 		end
-	end
-	if not uid and inRaid then -- check raid, raid pet, and raid target units
-		for i = 1, GetNumGroupMembers() do
-			uid = CheckUnitIDs("raid"..i, guid); if uid then break end
-			uid = CheckUnitIDs("raidpet"..i, guid); if uid then break end
-			uid = CheckUnitIDs("raid"..i.."target", guid); if uid then break end
-		end
-	end
-	if not uid then -- check nameplates as last resort
 		for i = 1, 40 do
 			local np = nameplateUnits[i]
 			local id = UnitGUID(np)
@@ -851,10 +865,11 @@ end
 local function CheckRaidTargets()
 	doUpdate = true
 	for _, unit in pairs(units) do CheckRaidTarget(unit) end -- first check primary units
-	if IsInRaid() then
-		for i = 1, GetNumGroupMembers() do CheckRaidTarget("raid"..i); CheckRaidTarget("raidpet"..i); CheckRaidTarget("raid"..i.."target") end
-	else
-		for i = 1, GetNumGroupMembers() do CheckRaidTarget("party"..i); CheckRaidTarget("partypet"..i); CheckRaidTarget("party"..i.."target") end
+	local inRaid, inGroup = IsInRaid(), IsInGroup()
+	if inRaid then
+		for i = 1, MAX_RAID_MEMBERS do CheckRaidTarget(raidUnits[i]); CheckRaidTarget(raidUnitPets[i]); CheckRaidTarget(raidUnitTargets[i]) end
+	elseif inGroup then
+		for i = 1, MAX_PARTY_MEMBERS do CheckRaidTarget(partyUnits[i]); CheckRaidTarget(partyUnitPets[i]); CheckRaidTarget(partyUnitTargets[i]) end
 	end
 end
 
@@ -865,7 +880,7 @@ local function CheckMouseoverRaidTarget() CheckRaidTarget("mouseover"); CheckRai
 function MOD:GetRaidTarget(id) for k, v in pairs(raidTargets) do if v == id then return k end end return nil end
 
 -- When UI Scale changes need to recalculate pixel perfect settings and force a complete update
-function UIScaleChanged() updateUIScale = true end
+local function UIScaleChanged() updateUIScale = true end
 
 -- Event called when addon is enabled
 function MOD:OnEnable()
@@ -878,7 +893,7 @@ function MOD:OnEnable()
 	MOD.Nest_Initialize() -- initialize the graphics module
 	MOD:InitializeConditions() -- initialize condition evaluation module
 	MOD:InitializeValues() -- initialize functions used for value bars
-	MOD:BAG_UPDATE("OnEnable") -- initialize bag cooldowns
+	MOD:BAG_UPDATE_DELAYED("OnEnable") -- initialize bag cooldowns
 	MOD:UNIT_INVENTORY_CHANGED("OnEnable", "player") -- initialize inventory cooldowns
 
 	-- Create a frame so that updates can be registered
@@ -893,7 +908,7 @@ function MOD:OnEnable()
 	self:RegisterEvent("UNIT_TARGET")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("SPELLS_CHANGED")
-	self:RegisterEvent("BAG_UPDATE")
+	self:RegisterEvent("BAG_UPDATE_DELAYED")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	self:RegisterEvent("RAID_TARGET_UPDATE", CheckRaidTargets)
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", CheckMouseoverRaidTarget)
@@ -910,8 +925,11 @@ function MOD:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_START", CheckGCD)
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", CheckSpellCasts)
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START", CheckCastBar)
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", CombatLogTracker)
 	self:RegisterEvent("UI_SCALE_CHANGED", UIScaleChanged)
+	-- separate the ultra-spammy C_L_E_U from the AceEvent baggage
+	MOD.cleu_parser = MOD.cleu_parser or CreateFrame("Frame")
+	MOD.cleu_parser:SetScript("OnEvent", CombatLogTracker)
+	MOD.cleu_parser:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
 	if MOD.ExpansionIsOrBelow(LE_EXPANSION_WRATH_OF_THE_LICH_KING) then -- register events specific to classic
 		if MOD.LCD then -- in classic, add library callback so target auras are handled correctly
@@ -949,12 +967,7 @@ end
 
 -- Updates will be driven by the new timer function, compute elapsed time since last update
 local function UpdateHandler()
-	now = GetTime()
-	local elapsed = now - lastTime -- seconds since last call to update
-	if elapsed > 1.0 then elapsed = 1.0 end -- should only happen during initialization
-	MOD:Update(elapsed)
-	lastTime = now
-	C_Timer.After(0.001, UpdateHandler) -- register to be called for next frame
+	MOD.mainLoopTicker = C_Timer.NewTicker(0.2, MOD.Update)
 end
 
 -- Initialize list of units that are tracked
@@ -976,7 +989,7 @@ function MOD:PLAYER_ENTERING_WORLD()
 			tagBuffs[k] = {}; tagDebuffs[k] = {}; cacheBuffs[k] = {}; cacheDebuffs[k] = {}
 		end
 		updateCooldowns = true -- start tracking cooldowns
-		MOD:InitializeBuffTooltip() -- initialize tooltip used to monitor weapon buffs
+		MOD:InitializeScanTooltip() -- initialize tooltip used to monitor weapon buffs
 		InitializeIcons() -- cache special purpose icons
 		MOD:InitializeOverlays() -- initialize overlays used to cancel player buffs
 		MOD:InitializeInCombatBar() -- initialize special bar for cancelling buffs in combat
@@ -1029,8 +1042,8 @@ function MOD:SPELLS_CHANGED() MOD:SetCooldownDefaults(); updateCooldowns = true;
 
 -- Event called when equipment in a unit's inventory changes
 function MOD:UNIT_INVENTORY_CHANGED(e, unit)
-	TriggerCooldownUpdate()
 	if unit == "player" then
+		TriggerCooldownUpdate()
 		-- update inventory cooldown table
 		table.wipe(inventoryCooldowns) -- update inventory item cooldown table
 		for slot = 0, 19 do -- check each inventory slot for usable items
@@ -1045,7 +1058,7 @@ function MOD:UNIT_INVENTORY_CHANGED(e, unit)
 end
 
 -- Event called when content of the player's bags changes
-function MOD:BAG_UPDATE(e)
+function MOD:BAG_UPDATE_DELAYED(e)
 	TriggerCooldownUpdate()
 	table.wipe(bagCooldowns) -- update bag item cooldown table
 	for bag = 0, NUM_BAG_SLOTS do
@@ -1077,46 +1090,46 @@ local function InitializeTalents()
 	table.wipe(MOD.talents);
 	table.wipe(MOD.talentList)
 
-	activeConfigID = C_ClassTalents.GetActiveConfigID()
+	local activeConfigID = C_ClassTalents.GetActiveConfigID()
 	if (activeConfigID) then
-		configInfo = C_Traits.GetConfigInfo(activeConfigID);
+		local configInfo = C_Traits.GetConfigInfo(activeConfigID);
 
 		local select = 1
 		for _, treeID in pairs(configInfo.treeIDs) do
-			nodes = C_Traits.GetTreeNodes(treeID)
+			local nodes = C_Traits.GetTreeNodes(treeID)
 
 			for _, nodeID in pairs(nodes) do
-				nodeInfo = C_Traits.GetNodeInfo(activeConfigID, nodeID)
+				local nodeInfo = C_Traits.GetNodeInfo(activeConfigID, nodeID)
 
 				for _,entryID in pairs(nodeInfo.entryIDs) do
-					entryInfo = C_Traits.GetEntryInfo(activeConfigID, entryID)
-                    if not entryInfo.definitionID then
-                        break
-                    end
+					local entryInfo = C_Traits.GetEntryInfo(activeConfigID, entryID)
+          if not entryInfo.definitionID then
+              break
+          end
 
-                    definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
-                    if not definitionInfo.spellID then
-                        break
-                    end
+          local definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
+          if not definitionInfo.spellID then
+              break
+          end
 
-                    name, rank, icon = SHIM:GetSpellInfo(definitionInfo.spellID)
-                    if name then
-                        local talentActive
+          local name, rank, icon = SHIM:GetSpellInfo(definitionInfo.spellID)
+          if name then
+              local talentActive
 
-                        if bit.band(nodeInfo.flags, 1) == 1 and nodeInfo.entryIDsWithCommittedRanks[1] ~= nil then
-                            talentActive = entryID == nodeInfo.entryIDsWithCommittedRanks[1]
-                        else
-                            talentActive = nodeInfo.currentRank > 0
-                        end
+              if bit.band(nodeInfo.flags, 1) == 1 and nodeInfo.entryIDsWithCommittedRanks[1] ~= nil then
+                  talentActive = entryID == nodeInfo.entryIDsWithCommittedRanks[1]
+              else
+                  talentActive = nodeInfo.currentRank > 0
+              end
 
-                        MOD.talents[name] = {
-                            tab = currentSpec,
-                            icon = icon,
-                            active = talentActive
-                        }
-                        MOD.talentList[select] = name
-                        select = select + 1
-                    end
+              MOD.talents[name] = {
+                  tab = currentSpec,
+                  icon = icon,
+                  active = talentActive
+              }
+              MOD.talentList[select] = name
+              select = select + 1
+          end
 				end
 			end
 		end
@@ -1246,7 +1259,11 @@ local function CheckMiscellaneousUpdates()
 end
 
 -- Update routine called before each frame is displayed, throttled to minimize CPU usage
-function MOD:Update(elapsed)
+function MOD:Update()
+	now = GetTime()
+	local elapsed = now - lastTime
+	if elapsed > 1.0 then elapsed = 1.0 end -- should only happen during initialization
+	lastTime = now
 	local elapsedTarget = MOD.db.global.UpdateRate or 0.2
 	local refreshTarget = MOD.db.global.AnimationRate or 0.03
 	local throttleRate
@@ -1471,36 +1488,38 @@ end
 
 -- Initialize tooltip to be used for determining weapon buffs
 -- This code is based on the Pitbull implementation
-function MOD:InitializeBuffTooltip()
-	--buffTooltip = CreateFrame("GameTooltip", "Raven_Weaponbuff_Tooltip", UIParent)
-	local tipName = "Raven_Weaponbuff_Tooltip"
-	buffTooltip = buffTooltip or CreateFrame("GameTooltip", tipName, nil)
-	buffTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
-	buffTooltip.tooltipLines = buffTooltip.tooltipLines or {} -- cache of font strings for each line in the tooltip
+function MOD:InitializeScanTooltip()
+	local tipName = "Raven_Scanning_Tooltip"
+	scanningTooltip = scanningTooltip or CreateFrame("GameTooltip", tipName, nil, "GameTooltipTemplate")
+	scanningTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	scanningTooltip.tooltipLines = scanningTooltip.tooltipLines or {} -- cache of font strings for each line in the tooltip
 	for i = 1, 30 do
 		local leftText, rightText = _G[tipName.."TextLeft"..i], _G[tipName.."TextRight"..i]
 		if leftText then
-			buffTooltip.tooltipLines[i] = leftText
+			scanningTooltip.tooltipLines[i] = leftText
 		else
-			local ls = buffTooltip:CreateFontString(tipName.."TextLeft"..i, "ARTWORK", "GameTooltipText")
-			local rs = buffTooltip:CreateFontString(tipName.."TextRight"..i, "ARTWORK", "GameTooltipText")
+			local ls = scanningTooltip:CreateFontString(tipName.."TextLeft"..i, "ARTWORK", "GameTooltipText")
+			local rs = scanningTooltip:CreateFontString(tipName.."TextRight"..i, "ARTWORK", "GameTooltipText")
 			ls:SetFontObject(GameTooltipText)
 			rs:SetFontObject(GameTooltipText)
-			buffTooltip.tooltipLines[i] = ls
-			buffTooltip:AddFontStrings(buffTooltip.tooltipLines[i], rs)
+			scanningTooltip.tooltipLines[i] = ls
+			scanningTooltip:AddFontStrings(scanningTooltip.tooltipLines[i], rs)
 		end
 	end
 end
 
 -- Return the temporary table for storing buff tooltips
-function MOD:GetBuffTooltip()
-	buffTooltip:ClearLines()
+function MOD:GetScanTooltip()
+	if not scanningTooltip then
+		scanningTooltip = MOD:InitializeScanTooltip()
+	end
+	scanningTooltip:ClearLines()
 
-	if not buffTooltip:IsOwned(WorldFrame) then
-		buffTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	if not scanningTooltip:IsOwned(WorldFrame) then
+		scanningTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 	end
 
-	return buffTooltip
+	return scanningTooltip
 end
 
 -- No easy way to get this info, so scan item slot info for mainhand and offhand weapons using a tooltip
@@ -1527,7 +1546,7 @@ local function GetWeaponBuffName(weaponSlot)
 end
 
 local function GetWeaponBuffNameOld(weaponSlot)
-	local tt = MOD:GetBuffTooltip()
+	local tt = MOD:GetScanTooltip()
 	tt:SetInventoryItem("player", weaponSlot)
 
 	for i = 1, 30 do
@@ -1952,10 +1971,11 @@ function MOD:UpdateTrackers()
 		ValidateUnitIDs()
 		table.wipe(refreshUnits) -- table of guids to prevent refreshing multiple times
 		MOD:AddTrackers("player"); MOD:AddTrackers("target");  MOD:AddTrackers("focus")
-		if IsInRaid() then
-			for i = 1, GetNumGroupMembers() do MOD:AddTrackers("raid"..i); MOD:AddTrackers("raidpet"..i); MOD:AddTrackers("raid"..i.."target") end
-		else
-			for i = 1, GetNumGroupMembers() do MOD:AddTrackers("party"..i); MOD:AddTrackers("partypet"..i); MOD:AddTrackers("party"..i.."target") end
+		local inRaid, inGroup = IsInRaid(), IsInGroup()
+		if inRaid then
+			for i = 1, MAX_RAID_MEMBERS do MOD:AddTrackers(raidUnits[i]); MOD:AddTrackers(raidUnitPets[i]); MOD:AddTrackers(raidUnitTargets[i]) end
+		elseif inGroup then
+			for i = 1, MAX_PARTY_MEMBERS do MOD:AddTrackers(partyUnits[i]); MOD:AddTrackers(partyUnitPets[i]); MOD:AddTrackers(partyUnitTargets[i]) end
 		end
 		local pgid = UnitGUID("pet")
 		if petGUID and (petGUID ~= pgid) then MOD:RemoveTrackers(petGUID) end
