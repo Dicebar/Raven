@@ -548,19 +548,19 @@ end
 -- Set an entry in a bar group cache block
 local function SetCache(bg, block, name, value)
 	if not bg.cache then bg.cache = {} end
-	if not bg.cache.block then bg.cache.block = {} end
-	bg.cache.block[name] = value
+	if not bg.cache[block] then bg.cache[block] = {} end
+	bg.cache[block][name] = value
 end
 
 -- Get a value from a bar group cache block
 local function GetCache(bg, block, name)
-	if not bg.cache or not bg.cache.block then return nil end
-	return bg.cache.block[name]
+	if not bg.cache or not bg.cache[block] then return nil end
+	return bg.cache[block][name]
 end
 
 -- Reset a bar group cache block
 local function ResetCache(bg, block)
-	if bg.cache and bg.cache.block then table.wipe(bg.cache.block) end
+	if bg.cache and bg.cache[block] then table.wipe(bg.cache[block]) end
 end
 
 -- Update a bar group with the current values in the profile
