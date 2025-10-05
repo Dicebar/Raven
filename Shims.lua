@@ -4,27 +4,35 @@ local SHIM = MOD.SHIM
 local NOP = function(...)
 	return
 end
+
 do -- C_Container
 	local GetContainerItemID, GetContainerNumSlots
+
+	-- GetContainerItemID
 	if C_Container and C_Container.GetContainerItemID then
 		GetContainerItemID = C_Container.GetContainerItemID
 	elseif _G.GetContainerItemID then
 		GetContainerItemID = _G.GetContainerItemID
 	end
+	function SHIM:GetContainerItemID(bag, slot)
+		return GetContainerItemID(bag, slot)
+	end
+
+	-- GetContainerNumSlots
 	if C_Container and C_Container.GetContainerNumSlots then
 		GetContainerNumSlots = C_Container.GetContainerNumSlots
 	elseif _G.GetContainerNumSlots then
 		GetContainerNumSlots = _G.GetContainerNumSlots
 	end
-	function SHIM:GetContainerItemID(bag, slot)
-		return GetContainerItemID(bag, slot)
-	end
 	function SHIM:GetContainerNumSlots(bag)
 		return GetContainerNumSlots(bag)
 	end
 end
+
 do -- C_CurrencyInfo
 	local GetCoinTextureString
+
+	-- GetCoinTextureString
 	if C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString then
 		GetCoinTextureString = C_CurrencyInfo.GetCoinTextureString
 	elseif _G.GetCoinTextureString then
@@ -34,8 +42,11 @@ do -- C_CurrencyInfo
 		return GetCoinTextureString(amount)
 	end
 end
+
 do -- C_Item/C_Container
 	local GetItemCooldown, GetItemCount, GetItemIconByID, GetItemInfo, GetItemSpell, IsUsableItem
+
+	-- GetItemCooldown
 	if C_Item and C_Item.GetItemCooldown then
 		GetItemCooldown = C_Item.GetItemCooldown
 	elseif C_Container and C_Container.GetItemCooldown then
@@ -46,6 +57,8 @@ do -- C_Item/C_Container
 	function SHIM:GetItemCooldown(item)
 		return GetItemCooldown(item)
 	end
+
+	-- GetItemCount
 	if C_Item and C_Item.GetItemCount then
 		GetItemCount = C_Item.GetItemCount
 	elseif _G.GetItemCount then
@@ -54,6 +67,8 @@ do -- C_Item/C_Container
 	function SHIM:GetItemCount(item, includeBank, includeCharges)
 		return GetItemCount(item, includeBank, includeCharges)
 	end
+
+	-- GetItemIconByID
 	if C_Item and C_Item.GetItemIconByID then
 		GetItemIconByID = C_Item.GetItemIconByID
 	elseif _G.GetItemIcon then
@@ -62,6 +77,8 @@ do -- C_Item/C_Container
 	function SHIM:GetItemIconByID(itemID)
 		return GetItemIconByID(itemID)
 	end
+
+	-- GetItemInfo
 	if C_Item and C_Item.GetItemInfo then
 		GetItemInfo = C_Item.GetItemInfo
 	elseif _G.GetItemInfo then
@@ -70,6 +87,8 @@ do -- C_Item/C_Container
 	function SHIM:GetItemInfo(itemID)
 		return GetItemInfo(itemID)
 	end
+
+	-- GetItemSpell
 	if C_Item and C_Item.GetItemSpell then
 		GetItemSpell = C_Item.GetItemSpell
 	elseif _G.GetItemSpell then
@@ -78,6 +97,8 @@ do -- C_Item/C_Container
 	function SHIM:GetItemSpell(itemID)
 		return GetItemSpell(itemID)
 	end
+
+	-- IsUsableItem
 	if C_Item and C_Item.IsUsableItem then
 		IsUsableItem = C_Item.IsUsableItem
 	elseif _G.IsUsableItem then
@@ -87,8 +108,11 @@ do -- C_Item/C_Container
 		return IsUsableItem(item)
 	end
 end
+
 do -- C_Spell
 	local GetSpellInfo, GetSpellTexture, GetSpellCooldown, IsUsableSpell, GetSpellChargesByID
+
+	-- GetSpellInfo
 	if C_Spell and C_Spell.GetSpellInfo then
 		GetSpellInfo = C_Spell.GetSpellInfo
 		function SHIM:GetSpellInfo(spellID)
@@ -103,6 +127,8 @@ do -- C_Spell
 			return GetSpellInfo(spellID)
 		end
 	end
+
+	-- GetSpellTexture
 	if C_Spell and C_Spell.GetSpellInfo then
 		GetSpellTexture = C_Spell.GetSpellInfo
 		function SHIM:GetSpellTexture(spellID)
@@ -117,6 +143,8 @@ do -- C_Spell
 			return GetSpellTexture(spellID)
 		end
 	end
+
+	-- GetSpellCooldown
 	if C_Spell and C_Spell.GetSpellCooldown then
 		GetSpellCooldown = C_Spell.GetSpellCooldown
 		function SHIM:GetSpellCooldown(spellID)
@@ -132,6 +160,8 @@ do -- C_Spell
 			return GetSpellCooldown(spellID)
 		end
 	end
+
+	-- IsUsableSpell
 	if C_Spell and C_Spell.IsSpellUsable then
 		IsUsableSpell = C_Spell.IsSpellUsable
 	elseif _G.IsUsableSpell then
@@ -140,6 +170,8 @@ do -- C_Spell
 	function SHIM:IsUsableSpell(spell)
 		return IsUsableSpell(spell)
 	end
+
+	-- GetSpellChargesByID
 	if C_Spell and C_Spell.GetSpellChargesByID then
 		GetSpellChargesByID = C_Spell.GetSpellChargesByID
 		function SHIM:GetSpellChargesByID(spellID)
@@ -155,8 +187,11 @@ do -- C_Spell
 		end
 	end
 end
+
 do -- C_SpellBook
 	local GetNumSpellTabs, GetSpellTabInfo, GetSpellBookItemName, GetSpellBookItemInfo, HasPetSpells, GetSpellBookItemCooldown, GetSpellCharges
+
+	-- GetNumSpellTabs
 	if C_SpellBook and C_SpellBook.GetNumSpellBookSkillLines then
 		GetNumSpellTabs = C_SpellBook.GetNumSpellBookSkillLines
 	elseif _G.GetNumSpellTabs then
@@ -165,6 +200,8 @@ do -- C_SpellBook
 	function SHIM:GetNumSpellTabs()
 		return GetNumSpellTabs()
 	end
+
+	-- GetSpellTabInfo
 	if C_SpellBook and C_SpellBook.GetSpellBookSkillLineInfo then
 		GetSpellTabInfo = C_SpellBook.GetSpellBookSkillLineInfo
 		function SHIM:GetSpellTabInfo(tabIndex)
@@ -179,6 +216,8 @@ do -- C_SpellBook
 			return GetSpellTabInfo(tabIndex)
 		end
 	end
+
+	-- GetSpellBookItemName
 	if C_SpellBook and C_SpellBook.GetSpellBookItemName then
 		GetSpellBookItemName = C_SpellBook.GetSpellBookItemName
 		function SHIM:GetSpellBookItemName(index, bookType)
@@ -195,6 +234,8 @@ do -- C_SpellBook
 			return GetSpellBookItemName(index, bookType)
 		end
 	end
+
+	-- GetSpellBookItemInfo
 	if C_SpellBook and C_SpellBook.GetSpellBookItemInfo then
 		GetSpellBookItemInfo = C_SpellBook.GetSpellBookItemInfo
 		function SHIM:GetSpellBookItemInfo(index, bookType)
@@ -203,6 +244,7 @@ do -- C_SpellBook
 			elseif bookType == "pet" then
 				bookType = Enum.SpellBookSpellBank.Pet
 			end
+
 			local info = GetSpellBookItemInfo(index, bookType)
 			if info then
 				local spellID = info.actionID
@@ -233,11 +275,6 @@ do -- C_SpellBook
 		GetSpellBookItemInfo = _G.GetSpellBookItemInfo
 		local IsPassiveSpell = _G.IsPassiveSpell
 		function SHIM:GetSpellBookItemInfo(index, bookType)
-			if bookType == Enum.SpellBookSpellBank.Player then
-				bookType = "spell"
-			elseif bookType == Enum.SpellBookSpellBank.Pet then
-				bookType = "pet"
-			end
 			local itemType, spellID = GetSpellBookItemInfo(index, bookType)
 			if itemType == "PETACTION" then
 				spellID = bit.band(0xFFFFFF, spellID)
@@ -246,6 +283,8 @@ do -- C_SpellBook
 			return itemType, spellID, IsPassiveSpell(spellID)
 		end
 	end
+
+	-- HasPetSpells
 	if C_SpellBook and C_SpellBook.HasPetSpells then
 		HasPetSpells = C_SpellBook.HasPetSpells
 	elseif _G.HasPetSpells then
@@ -254,6 +293,8 @@ do -- C_SpellBook
 	function SHIM:HasPetSpells()
 		return HasPetSpells()
 	end
+
+	-- GetSpellBookItemCooldown
 	if C_SpellBook and C_SpellBook.GetSpellBookItemCooldown then
 		GetSpellBookItemCooldown = C_SpellBook.GetSpellBookItemCooldown
 		function SHIM:GetSpellBookItemCooldown(index, spellBank)
@@ -271,14 +312,11 @@ do -- C_SpellBook
 			return GetSpellBookItemCooldown(index, spellBank)
 		end
 	end
+
+	-- GetSpellCharges
 	if C_SpellBook and C_SpellBook.GetSpellBookItemCharges then
 		GetSpellCharges = C_SpellBook.GetSpellBookItemCharges
 		function SHIM:GetSpellCharges(index, bookType)
-			if bookType == "spell" then
-				bookType = Enum.SpellBookSpellBank.Player
-			elseif bookType == "pet" then
-				bookType = Enum.SpellBookSpellBank.Pet
-			end
 			local info = GetSpellCharges(index, bookType)
 			if info then
 				return info.currentCharges, info.maxCharges, info.cooldownStartTime, info.cooldownDuration, info.chargeModRate
@@ -291,8 +329,11 @@ do -- C_SpellBook
 		end
 	end
 end
+
 do -- C_SpecializationInfo
 	local GetSpecialization, GetSpecializationInfo
+
+	-- GetSpecialization
 	if C_SpecializationInfo and C_SpecializationInfo.GetSpecialization then
 		GetSpecialization = C_SpecializationInfo.GetSpecialization
 	elseif _G.GetSpecialization then
@@ -307,6 +348,8 @@ do -- C_SpecializationInfo
 	function SHIM:GetSpecialization()
 		return GetSpecialization()
 	end
+
+	-- GetSpecializationInfo
 	if C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo then
 		GetSpecializationInfo = C_SpecializationInfo.GetSpecializationInfo
 	elseif _G.GetSpecializationInfo then
