@@ -183,7 +183,7 @@ do -- C_Spell
 	elseif _G.GetSpellCharges then
 		GetSpellChargesByID = _G.GetSpellCharges
 		function SHIM:GetSpellChargesByID(spellID)
-			return GetSpellChargesByID(spellID)
+			return GetSpellCharges(spellID)
 		end
 	end
 end
@@ -316,16 +316,22 @@ do -- C_SpellBook
 	-- GetSpellCharges
 	if C_SpellBook and C_SpellBook.GetSpellBookItemCharges then
 		GetSpellCharges = C_SpellBook.GetSpellBookItemCharges
-		function SHIM:GetSpellCharges(index, bookType)
-			local info = GetSpellCharges(index, bookType)
+		function SHIM:GetSpellCharges(index, book)
+			if book == "spell" then
+				book = Enum.SpellBookSpellBank.Player
+			elseif book == "pet" then
+				book = Enum.SpellBookSpellBank.Pet
+			end
+
+			local info = GetSpellCharges(index, book)
 			if info then
 				return info.currentCharges, info.maxCharges, info.cooldownStartTime, info.cooldownDuration, info.chargeModRate
 			end
 		end
 	elseif _G.GetSpellCharges then
 		GetSpellCharges = _G.GetSpellCharges
-		function SHIM:GetSpellCharges(index, bookType)
-			return GetSpellCharges(index, bookType)
+		function SHIM:GetSpellCharges(index, book)
+			return GetSpellCharges(index, book)
 		end
 	end
 end
