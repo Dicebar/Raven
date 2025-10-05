@@ -1371,7 +1371,7 @@ end
 
 -- Updates will be driven by the new timer function, compute elapsed time since last update
 local function UpdateHandler()
-	MOD.mainLoopTicker = C_Timer.NewTicker(0.2, MOD.Update)
+	MOD.mainLoopTicker = C_Timer.NewTicker(MOD.db.global.UpdateRate or 0.2, MOD.Update)
 end
 
 -- Initialize list of units that are tracked
