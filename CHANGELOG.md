@@ -1,3 +1,10 @@
+# 5 October 2025
+- Lots of cleanups
+- Fix tooltip value scanning for item
+- Fix tooltip value scanning for Classic in general
+- Optimized shims
+- Many thanks to Road-Block for providing all of the above!
+
 # 2 July 2025
 - Added support for Mists of Pandaria Classic (thanks to Road-Block for providing a fix!)
 
