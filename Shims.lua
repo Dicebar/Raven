@@ -132,8 +132,8 @@ do -- C_Spell
 			return GetSpellCooldown(spellID)
 		end
 	end
-	if C_Spell and C_Spell.IsUsableSpell then
-		IsUsableSpell = C_Spell.IsUsableSpell
+	if C_Spell and C_Spell.IsSpellUsable then
+		IsUsableSpell = C_Spell.IsSpellUsable
 	elseif _G.IsUsableSpell then
 		IsUsableSpell = _G.IsUsableSpell
 	end
