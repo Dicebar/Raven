@@ -8,7 +8,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Raven")
 local valueFunctions, colorFunctions
 local mirrorIcons
 local iconXP, iconMail, iconCurrency, iconClock, iconLatency, iconFramerate, iconMap, iconMapX, iconMapY, iconArrow, iconAzerite
-local iconLevel, iconHealth, iconPower, iconHeals, iconAbsorb, iconStagger, iconThreat, iconDurability, iconCombat, iconRune, iconRested, iconResting
+local iconLevel, iconHealth, iconCombo, iconPower, iconHeals, iconAbsorb, iconStagger, iconThreat, iconDurability, iconCombat, iconRune, iconRested, iconResting
 local iconChi, iconArcaneCharge, iconSoulShard, iconHonor, iconHonorHorde, iconHonorAlliance, iconReputation, iconClassification
 local directionTable = { "S", "SSE", "SE", "ESE", "E", "ENE", "NE", "NNE", "N", "NNW", "NW", "WNW", "W", "WSW", "SW", "SSW" }
 local rc = { r = 1, g = 0, b = 0 }
@@ -38,34 +38,57 @@ end
 local function ColorPower(power, token, altR, altG, altB)
 	if token then
 		local c = PowerBarColor[token]
-		if c then return c.r, c.g, c.b end
-	elseif altR and alrG and altB then
+		if c then
+			return c.r, c.g, c.b
+		end
+	elseif altR and altG and altB then
 		return altR, altG, altB
 	elseif power then
 		local c = PowerBarColor[power]
-		if c then return c.r, c.g, c.b end
+		if c then
+			return c.r, c.g, c.b
+		end
 	end
 	local c = PowerBarColor["MANA"]
-	if c then return c.r, c.g, c.b end
+	if c then
+		return c.r, c.g, c.b
+	end
 	return 0, 0, 1 -- fall back is plain blue but should never happen!
 end
 
 local function GetTimeText(zone, military, ampm)
 	local t = ""
 	local h, m = GetGameTime()
-	if zone == "local" then local d = date("*t"); h = d.hour end
+	if zone == "local" then
+		local d = date("*t")
+		h = d.hour
+	end
 	if zone == "session" then
-		local s = GetTime() - startTime; h = math.floor(s / 3600); m = math.floor((s - (h * 3600)) / 60)
-		if h > 0 then t = string.format("%d:%02d:%02d", h, m, math.floor(s - (h * 3600) - (m * 60)))
-		else t = string.format("%d:%02d", m, math.floor(s - (m * 60))) end
+		local s = GetTime() - startTime
+		h = math.floor(s / 3600)
+		m = math.floor((s - (h * 3600)) / 60)
+		if h > 0 then
+			t = string.format("%d:%02d:%02d", h, m, math.floor(s - (h * 3600) - (m * 60)))
+		else
+			t = string.format("%d:%02d", m, math.floor(s - (m * 60)))
+		end
 	else
 		if military then
-			t = string.format ("%02d:%02d", h, m)
+			t = string.format("%02d:%02d", h, m)
 		else
-			if ampm then ampm = " AM" end
-			if h >= 12 then h = h - 12; if ampm then ampm = " PM" end end
-			if h == 0 then h = 12 end
-			t = string.format ("%d:%02d%s", h, m, ampm or "")
+			if ampm then
+				ampm = " AM"
+			end
+			if h >= 12 then
+				h = h - 12
+				if ampm then
+					ampm = " PM"
+				end
+			end
+			if h == 0 then
+				h = 12
+			end
+			t = string.format("%d:%02d%s", h, m, ampm or "")
 		end
 	end
 	return t
@@ -87,7 +110,9 @@ end
 
 -- Return a formatted string for a possibly non-integer value, shortening it as needed for big numbers.
 local function GetFormattedNumber(x, precision)
-	if abs(x) > 1000 then return GetFormattedInteger(x) end
+	if abs(x) > 1000 then
+		return GetFormattedInteger(x)
+	end
 	if precision == 1 then
 		x = math.floor((x * 10) + 0.5) / 10 -- rounded to nearest 1/10
 		return string.format("%.1f", x)
@@ -131,25 +156,36 @@ local function GetFormattedText(textFormat, value, maxValue)
 	return s
 end
 
-local function GetTimerText(value) return GetFormattedText("t", value, 1) end
+local function GetTimerText(value)
+	return GetFormattedText("t", value, 1)
+end
 
 local function GetDurability()
 	local durability, repairCost, totalCurrent, totalMaximum, itemCount = 1, 0, 0, 0, 0
+	scanTooltip = scanTooltip or MOD:GetScanTooltip()
 	for slotID = 1, 18 do
 		if GetInventoryItemID("player", slotID) then
 			local currentDurability, maximumDurability = GetInventoryItemDurability(slotID)
 			if currentDurability and maximumDurability > 0 and currentDurability < maximumDurability then
 				local hasItem, _, cost = scanTooltip:SetInventoryItem("player", slotID)
-				if hasItem and cost and (cost > 0) then repairCost = repairCost + cost end
+				if hasItem and cost and (cost > 0) then
+					repairCost = repairCost + cost
+				end
 				local itemDurability = currentDurability / maximumDurability
-				if itemDurability < durability then durability = itemDurability end
+				if itemDurability < durability then
+					durability = itemDurability
+				end
 				totalCurrent = totalCurrent + currentDurability
 				totalMaximum = totalMaximum + maximumDurability
 			end
 		end
 	end
-	if totalCurrent == 0 then totalCurrent = 1 end
-	if totalMaximum == 0 then totalMaximum = 1 end
+	if totalCurrent == 0 then
+		totalCurrent = 1
+	end
+	if totalMaximum == 0 then
+		totalMaximum = 1
+	end
 	local dt = math.floor(durability * 100)
 	local dm = math.floor(100 * totalCurrent / totalMaximum)
 	return dt, dm, repairCost
@@ -173,44 +209,73 @@ end
 -- Must update more frequently! Check out power bar delay on monk windwalker...
 
 local function ValueUnitLevel(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local level = UnitLevel(unit)
-	if level == -1 then return true, maximumLevel, maximumLevel, "|cFFFF0000??|r", nil, iconLevel, "text", "Level", 1, 0, 0 end -- boss
+	if level == -1 then
+		return true, maximumLevel, maximumLevel, "|cFFFF0000??|r", nil, iconLevel, "text", "Level", 1, 0, 0
+	end -- boss
 	local r, g, b = UnitSelectionColor(unit)
 	local s = GetFormattedText(fmt, level, maximumLevel)
 	return true, level, maximumLevel, s, nil, iconLevel, "text", "Level", r, g, b -- normal level player or NPC
 end
 
 local function ValueUnitHealth(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local h = UnitHealth(unit)
 	local hmax = UnitHealthMax(unit)
-	if not h or not hmax then return false end
-	if hmax == 0 then hmax = 1 end -- avoid divide by zero
+	if not h or not hmax then
+		return false
+	end
+	if hmax == 0 then
+		hmax = 1
+	end -- avoid divide by zero
 	local r, g, b = ColorHealth(h, hmax)
 	local s = GetFormattedText(fmt, h, hmax)
-	if UnitIsDead(unit) then s = L["Dead"]; h = 0 elseif UnitIsGhost(unit) then s = L["Ghost"]; h = 0 end
+	if UnitIsDead(unit) then
+		s = L["Dead"]
+		h = 0
+	elseif UnitIsGhost(unit) then
+		s = L["Ghost"]
+		h = 0
+	end
 	return true, h, hmax, s, UnitName(unit), iconHealth, nil, nil, r, g, b
 end
 
 local function ValueUnitPower(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local power, token, altR, altG, altB = UnitPowerType(unit)
 	local r, g, b = ColorPower(power, token, altR, altG, altB)
 	local p = UnitPower(unit)
 	local pmax = UnitPowerMax(unit)
-	if not p or not pmax then return false end
-	if pmax == 0 then pmax = 1 end -- avoid divide by zero
+	if not p or not pmax then
+		return false
+	end
+	if pmax == 0 then
+		pmax = 1
+	end -- avoid divide by zero
 	local s = GetFormattedText(fmt, p, pmax)
 	return true, p, pmax, s, _G[token], iconPower, nil, nil, r, g, b
 end
 
 local function ValueClassification(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local classification = UnitClassification(unit)
-	if not classification then return false end
-	if MOD.LibBossIDs and MOD.CheckLibBossIDs(UnitGUID(unit)) then classification = "worldboss" end
-	local classificationList = { normal = L["Normal"], worldboss = L["Boss"], elite = L["Elite"], rare = L["Rare"], rlite = L["Rare Elite"], trivial = L["Trivial"], minus = L["Minus"] }
+	if not classification then
+		return false
+	end
+	if MOD.LibBossIDs and MOD.CheckLibBossIDs(UnitGUID(unit)) then
+		classification = "worldboss"
+	end
+	local classificationList =
+		{ normal = L["Normal"], worldboss = L["Boss"], elite = L["Elite"], rare = L["Rare"], rlite = L["Rare Elite"], trivial = L["Trivial"], minus = L["Minus"] }
 	local s = classificationList[classification]
 	return true, 0, 0, s, nil, iconClassification
 end
@@ -218,7 +283,9 @@ end
 local function ValueChi(unit, fmt)
 	local p = UnitPower("player", Enum.PowerType.Chi)
 	local pmax = UnitPowerMax("player", Enum.PowerType.Chi)
-	if not p or not pmax or (pmax == 0) then return false end
+	if not p or not pmax or (pmax == 0) then
+		return false
+	end
 	local c = PowerBarColor["CHI"] or rc
 	local s = GetFormattedText(fmt, p, pmax)
 	return true, p, pmax, s, nil, iconChi, nil, nil, c.r, c.g, c.b
@@ -227,7 +294,9 @@ end
 local function ValueComboPoints(unit, fmt)
 	local p = UnitPower("player", Enum.PowerType.ComboPoints)
 	local pmax = UnitPowerMax("player", Enum.PowerType.ComboPoints)
-	if not p or not pmax or (pmax == 0) then return false end
+	if not p or not pmax or (pmax == 0) then
+		return false
+	end
 	local c = PowerBarColor["COMBO_POINTS"] or rc
 	local s = GetFormattedText(fmt, p, pmax)
 	return true, p, pmax, s, nil, iconCombo, nil, nil, c.r, c.g, c.b
@@ -236,7 +305,9 @@ end
 local function ValueHolyPower(unit, fmt)
 	local p = UnitPower("player", Enum.PowerType.HolyPower)
 	local pmax = UnitPowerMax("player", Enum.PowerType.HolyPower)
-	if not p or not pmax or (pmax == 0) then return false end
+	if not p or not pmax or (pmax == 0) then
+		return false
+	end
 	local c = PowerBarColor["HOLY_POWER"] or rc
 	local s = GetFormattedText(fmt, p, pmax)
 	return true, p, pmax, s, nil, nil, nil, nil, c.r, c.g, c.b
@@ -245,7 +316,9 @@ end
 local function ValueEssence(unit, fmt)
 	local p = UnitPower("player", Enum.PowerType.Essence)
 	local pmax = UnitPowerMax("player", Enum.PowerType.Essence)
-	if not p or not pmax or (pmax == 0) then return false end
+	if not p or not pmax or (pmax == 0) then
+		return false
+	end
 	local c = PowerBarColor["ESSENCE"] or rc
 	local s = GetFormattedText(fmt, p, pmax)
 	return true, p, pmax, s, nil, nil, nil, nil, c.r, c.g, c.b
@@ -254,69 +327,113 @@ end
 local function ValueSoulShards(unit, fmt)
 	local p = UnitPower("player", Enum.PowerType.SoulShards)
 	local pmax = UnitPowerMax("player", Enum.PowerType.SoulShards)
-	if not p or not pmax or (pmax == 0) then return false end
+	if not p or not pmax or (pmax == 0) then
+		return false
+	end
 	local c = PowerBarColor["SOUL_SHARDS"] or rc
 	local s = GetFormattedText(fmt, p, pmax)
 	return true, p, pmax, s, nil, iconSoulShard, nil, nil, c.r, c.g, c.b
 end
 
 local function ValueRune(id, fmt)
-	if MOD.myClass ~= "DEATHKNIGHT" then return false end
+	if MOD.myClass ~= "DEATHKNIGHT" then
+		return false
+	end
 	local start, duration, ready = GetRuneCooldown(id)
 	if ready then
 		local c = MOD.ClassColors[MOD.myClass]
 		return true, 0, 0, "", nil, iconRune, nil, nil, c.r, c.g, c.b
 	end
 	local timeLeft = math.floor((duration - (GetTime() - start)) * 10) / 10
-	if timeLeft > duration then timeLeft = duration end
+	if timeLeft > duration then
+		timeLeft = duration
+	end
 	local t = timeLeft
-	if fmt == "i" then t = math.floor(timeLeft); if t < 0 then t = 0 end end -- integer time is truncated instead of rounded
+	if fmt == "i" then
+		t = math.floor(timeLeft)
+		if t < 0 then
+			t = 0
+		end
+	end -- integer time is truncated instead of rounded
 	local s = GetFormattedText(fmt, t, duration)
 	return true, timeLeft, duration, s, nil, iconRune, nil, nil, 0.5, 0.5, 0.5
 end
 
-local function ValueRune1(unit, fmt) return ValueRune(1, fmt) end
-local function ValueRune2(unit, fmt) return ValueRune(2, fmt) end
-local function ValueRune3(unit, fmt) return ValueRune(3, fmt) end
-local function ValueRune4(unit, fmt) return ValueRune(4, fmt) end
-local function ValueRune5(unit, fmt) return ValueRune(5, fmt) end
-local function ValueRune6(unit, fmt) return ValueRune(6, fmt) end
+local function ValueRune1(unit, fmt)
+	return ValueRune(1, fmt)
+end
+local function ValueRune2(unit, fmt)
+	return ValueRune(2, fmt)
+end
+local function ValueRune3(unit, fmt)
+	return ValueRune(3, fmt)
+end
+local function ValueRune4(unit, fmt)
+	return ValueRune(4, fmt)
+end
+local function ValueRune5(unit, fmt)
+	return ValueRune(5, fmt)
+end
+local function ValueRune6(unit, fmt)
+	return ValueRune(6, fmt)
+end
 
 local function ValueArcaneCharges(unit, fmt)
 	local p = UnitPower("player", Enum.PowerType.ArcaneCharges)
 	local pmax = UnitPowerMax("player", Enum.PowerType.ArcaneCharges)
-	if not p or not pmax or (pmax == 0) then return false end
+	if not p or not pmax or (pmax == 0) then
+		return false
+	end
 	local c = PowerBarColor["ARCANE_CHARGES"] or rc
 	local s = GetFormattedText(fmt, p, pmax)
 	return true, p, pmax, s, nil, iconArcaneCharge, nil, nil, c.r, c.g, c.b
 end
 
 local function ValueUnitThreat(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local status = UnitThreatSituation(unit) or 0
-	if status == 0 then return false end
+	if status == 0 then
+		return false
+	end
 	local r, g, b = 1, 0, 0
 	if GetThreatStatusColor then
 		r, g, b = GetThreatStatusColor(status)
 	else
-		if status == 0 then r = 0.69; g = 0.69; b = 0.69 end
-		if status == 1 then g = 1; b = 0.47 end
-		if status == 2 then g = 0.6 end
+		if status == 0 then
+			r = 0.69
+			g = 0.69
+			b = 0.69
+		end
+		if status == 1 then
+			g = 1
+			b = 0.47
+		end
+		if status == 2 then
+			g = 0.6
+		end
 	end
 	local s = GetFormattedText(fmt, status, 3)
 	return true, status, 3, nil, nil, iconThreat, nil, nil, r, g, b
 end
 
 local function ValueUnitPVP(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local isPVP = UnitIsPVP(unit)
-	if not isPVP then return false end
+	if not isPVP then
+		return false
+	end
 	local faction = UnitFactionGroup(unit)
 	local icon = "Interface\\TargetingFrame\\UI-PVP-" .. (faction or "FFA")
 	if unit == "player" then
 		local timer = GetPVPTimer()
 		if timer and (timer ~= -1) then
-			if timer == 301000 then return true, 0, 0, "|cFFFF0000PvP|r", nil, icon end
+			if timer == 301000 then
+				return true, 0, 0, "|cFFFF0000PvP|r", nil, icon
+			end
 			local s = "|cFFFF0000PvP " .. GetTimerText(timer / 1000) .. "|r"
 			return true, 0, 0, s, nil, icon
 		end
@@ -325,16 +442,22 @@ local function ValueUnitPVP(unit, fmt)
 end
 
 local function ValueUnitAbsorb(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local v = UnitGetTotalAbsorbs(unit) or 0
 	local vm = UnitHealthMax(unit) or 1
-	if vm < v then vm = v end
+	if vm < v then
+		vm = v
+	end
 	local s = GetFormattedText(fmt, v, vm)
 	return true, v, vm, s, L["Absorb"], iconAbsorb
 end
 
 local function ValueUnitIncomingHeals(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local h = UnitGetIncomingHeals(unit) or 0
 	local hmax = UnitHealthMax(unit)
 	local s = GetFormattedText(fmt, h, hmax)
@@ -342,22 +465,34 @@ local function ValueUnitIncomingHeals(unit, fmt)
 end
 
 local function ValueUnitHealthIncomingHeals(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local h = UnitHealth(unit)
 	local hmax = UnitHealthMax(unit)
-	if not h or not hmax then return false end
+	if not h or not hmax then
+		return false
+	end
 	local total = h + (UnitGetIncomingHeals(unit) or 0)
-	if total > hmax then total = hmax end
-	if hmax == 0 then hmax = 1 end -- avoid divide by zero
+	if total > hmax then
+		total = hmax
+	end
+	if hmax == 0 then
+		hmax = 1
+	end -- avoid divide by zero
 	local s = GetFormattedText(fmt, total, hmax)
 	return true, total, hmax, s, nil, iconHeals
 end
 
 local function ValueUnitStagger(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local v = UnitStagger(unit) or 0
 	local vm = UnitHealthMax(unit) or 1
-	if vm < v then vm = v end
+	if vm < v then
+		vm = v
+	end
 	local s = GetFormattedText(fmt, v, vm)
 	return true, v, vm, s, L["Stagger"], iconStagger
 end
@@ -365,8 +500,12 @@ end
 local function ValuePlayerXP(unit, fmt)
 	local xp = UnitXP("player")
 	local xpmax = UnitXPMax("player")
-	if not xp or not xpmax then return false end
-	if xpmax == 0 then xpmax = 1 end -- avoid divide by zero
+	if not xp or not xpmax then
+		return false
+	end
+	if xpmax == 0 then
+		xpmax = 1
+	end -- avoid divide by zero
 	local s = GetFormattedText(fmt, xp, xpmax)
 	local rested = GetXPExhaustion() or 0
 	xpTable[1] = "|cffffcc00Player XP|r"
@@ -380,29 +519,45 @@ end
 local function ValueRestedXP(unit, fmt)
 	local xp = GetXPExhaustion()
 	local xpmax = UnitXPMax("player")
-	if not xp or not xpmax then return false end
-	if xpmax == 0 then xpmax = 1 end -- avoid divide by zero
+	if not xp or not xpmax then
+		return false
+	end
+	if xpmax == 0 then
+		xpmax = 1
+	end -- avoid divide by zero
 	local s = GetFormattedText(fmt, xp, xpmax)
 	return true, xp, xpmax, s, nil, iconRested
 end
 
 local function ValueResting(unit, fmt)
-	if not IsResting() then return false end
+	if not IsResting() then
+		return false
+	end
 	return true, 0, 0, "Resting", nil, iconResting
 end
 
 local function ValueHonor(unit, fmt)
 	local xp = UnitHonor("player")
 	local xpmax = UnitHonorMax("player")
-	if not xp or not xpmax then return false end
-	if xpmax == 0 then xpmax = 1 end -- avoid divide by zero
+	if not xp or not xpmax then
+		return false
+	end
+	if xpmax == 0 then
+		xpmax = 1
+	end -- avoid divide by zero
 	local s = GetFormattedText(fmt, xp, xpmax)
 	local icon = iconHonor
 	local myFaction = UnitFactionGroup("player")
-	if myFaction == "Horde" then icon = iconHonorHorde elseif myFaction == "Alliance" then icon = iconHonorAlliance end
+	if myFaction == "Horde" then
+		icon = iconHonorHorde
+	elseif myFaction == "Alliance" then
+		icon = iconHonorAlliance
+	end
 	local level = UnitHonorLevel("player")
 	local t = L["Honor"]
-	if level then t = t .. " [" .. tostring(level) .. "]" end
+	if level then
+		t = t .. " [" .. tostring(level) .. "]"
+	end
 	return true, xp, xpmax, s, t, icon
 end
 
@@ -411,11 +566,15 @@ local function ValueReputation(unit, fmt)
 	if name and standing and barMin and barMax and barValue then
 		local xp = barValue - barMin
 		local xpmax = barMax - barMin
-		if xp < 0 then xp = 0 end
-		if xpmax == 0 then xpmax = 1 end -- avoid divide by zero
+		if xp < 0 then
+			xp = 0
+		end
+		if xpmax == 0 then
+			xpmax = 1
+		end -- avoid divide by zero
 		local s = GetFormattedText(fmt, xp, xpmax)
 		local c = FACTION_BAR_COLORS[standing] or rc
-		local label = _G['FACTION_STANDING_LABEL' .. standing]
+		local label = _G["FACTION_STANDING_LABEL" .. standing]
 		reputationTable[1] = "|cffffcc00Reputation|r"
 		reputationTable[2] = string.format("|cffffff00%s:|r %s %d/%d (%.0f%%)", name, label, xp, xpmax, (xp / xpmax) * 100)
 		return true, xp, xpmax, s, name, iconReputation, "lines", reputationTable, c.r, c.g, c.b
@@ -424,61 +583,90 @@ local function ValueReputation(unit, fmt)
 end
 
 local function ValueCombat(unit, fmt)
-	if MOD.combatTimer == 0 then return false end
+	if MOD.combatTimer == 0 then
+		return false
+	end
 	return true, 0, 0, GetTimerText(GetTime() - MOD.combatTimer), "In Combat", iconCombat
 end
 
 local function ValueUnitRaidMarker(unit, fmt)
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	local index = GetRaidTargetIndex(unit)
-	if not index then return false end
+	if not index then
+		return false
+	end
 	local icon = "Interface/TargetingFrame/UI-RaidTargetingIcon_" .. index
 	return true, 0, 0, nil, nil, icon
 end
 
 local function ValueAzerite(unit, fmt)
 	local azeriteItemLocation = C_AzeriteItem.FindActiveAzeriteItem()
-	if not azeriteItemLocation then return false end
+	if not azeriteItemLocation then
+		return false
+	end
 	local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
 	local itemName = azeriteItem:GetItemName()
-	if not itemName then return false end
+	if not itemName then
+		return false
+	end
 	local xp, xpmax = C_AzeriteItem.GetAzeriteItemXPInfo(azeriteItemLocation)
-	if not xp then xp = 0 end
-	if not xpmax or xpmax <= 0 then xpmax = 1 end
+	if not xp then
+		xp = 0
+	end
+	if not xpmax or xpmax <= 0 then
+		xpmax = 1
+	end
 	local currentLevel = C_AzeriteItem.GetPowerLevel(azeriteItemLocation)
 	local t = itemName
-	if currentLevel then t = t .. " [" .. tostring(currentLevel) .. "]" end
+	if currentLevel then
+		t = t .. " [" .. tostring(currentLevel) .. "]"
+	end
 	local s = GetFormattedText(fmt, xp, xpmax)
 	return true, xp, xpmax, s, t, iconAzerite
 end
 
 local function ValueMapX(unit, fmt)
 	local mapID = C_Map.GetBestMapForUnit("player")
-	if not mapID then return false end
+	if not mapID then
+		return false
+	end
 	local fx = 0
 	local position = C_Map.GetPlayerMapPosition(mapID, "player") -- fraction of maximum position
-	if position then fx = position.x * 100 end
+	if position then
+		fx = position.x * 100
+	end
 	local s = GetFormattedText(fmt, fx, 100)
 	return true, fx, 100, s, nil, iconMapX
 end
 
 local function ValueMapY(unit, fmt)
 	local mapID = C_Map.GetBestMapForUnit("player")
-	if not mapID then return false end
+	if not mapID then
+		return false
+	end
 	local fy = 0
 	local position = C_Map.GetPlayerMapPosition(mapID, "player") -- fraction of maximum position
-	if position then fy = position.y * 100 end
+	if position then
+		fy = position.y * 100
+	end
 	local s = GetFormattedText(fmt, fy, 100)
 	return true, fy, 100, s, nil, iconMapY
 end
 
 local function ValuePosition(unit, fmt)
 	local mapID = C_Map.GetBestMapForUnit("player")
-	if not mapID then return false end
+	if not mapID then
+		return false
+	end
 	local zone = C_Map.GetMapInfo(mapID).name
 	local fx, fy = 0, 0
 	local position = C_Map.GetPlayerMapPosition(mapID, "player") -- fraction of maximum position
-	if position then fx = position.x; fy = position.y end
+	if position then
+		fx = position.x
+		fy = position.y
+	end
 	fx = (math.floor((fx * 10000) + 0.5)) / 100
 	fy = (math.floor((fy * 10000) + 0.5)) / 100
 	local s = string.format("%0.2f, %0.2f", fx, fy)
@@ -487,14 +675,22 @@ end
 
 local function ValueFacing(unit, fmt)
 	local facing = GetPlayerFacing()
-	if not facing then return false end
+	if not facing then
+		return false
+	end
 	local theta = 180 + (facing * 360 / (2 * math.pi))
-	if theta > 360 then theta = theta - 360 end
+	if theta > 360 then
+		theta = theta - 360
+	end
 	local angle = math.floor(theta + 0.5)
-	if angle > 360 then angle = 0 end
+	if angle > 360 then
+		angle = 0
+	end
 	local s = GetFormattedText(fmt, angle, 360)
 	local direction = math.floor((theta / 22.5) + 0.5) + 1
-	if direction > 16 then direction = 1 end
+	if direction > 16 then
+		direction = 1
+	end
 	return true, theta, 360, s, directionTable[direction], iconArrow
 end
 
@@ -511,15 +707,21 @@ local function ValueMirror(id, fmt)
 	return false
 end
 
-local function ValueMirror1(unit, fmt) return ValueMirror(1, fmt) end
-local function ValueMirror2(unit, fmt) return ValueMirror(2, fmt) end
-local function ValueMirror3(unit, fmt) return ValueMirror(3, fmt) end
+local function ValueMirror1(unit, fmt)
+	return ValueMirror(1, fmt)
+end
+local function ValueMirror2(unit, fmt)
+	return ValueMirror(2, fmt)
+end
+local function ValueMirror3(unit, fmt)
+	return ValueMirror(3, fmt)
+end
 
 local function LatencyHandler(self, event, unit)
 	if event == "CURRENT_SPELL_CAST_CHANGED" then
 		latency.sentTime = GetTime()
 		-- MOD.Debug("sent", event, latency.sentTime)
-	elseif ((unit == "player") or (unit == "vehicle")) then
+	elseif (unit == "player") or (unit == "vehicle") then
 		if event == "UNIT_SPELLCAST_SUCCEEDED" then
 			latency.sentTime = nil
 			-- MOD.Debug("succeeded", event, latency.sentTime)
@@ -538,12 +740,19 @@ local function ValueCastBar(unit, fmt, spell, options)
 	local castingInfo, channelInfo = UnitCastingInfo, UnitChannelInfo
 
 	if UnitHasVehicleUI("player") then
-		if unit == "player" then checkUnit = "pet" elseif unit == "pet" then checkUnit = "player" end
+		if unit == "player" then
+			checkUnit = "pet"
+		elseif unit == "pet" then
+			checkUnit = "player"
+		end
 	end
 
-	castingInfo = CastingInfo; channelInfo = ChannelInfo
+	castingInfo = CastingInfo
+	channelInfo = ChannelInfo
 
-	if not unit or not UnitGUID(unit) then return false end
+	if not unit or not UnitGUID(unit) then
+		return false
+	end
 	if unit == "player" or unit == "vehicle" then
 		if not latency.frame then -- check if need to start event tracking
 			local f = CreateFrame("Frame")
@@ -566,15 +775,24 @@ local function ValueCastBar(unit, fmt, spell, options)
 		local duration = (endTime - startTime) / 1000
 		local timeLeft = (endTime / 1000) - GetTime()
 		local c = castColor
-		if channel then timeLeft = duration - timeLeft; c = channelColor end -- reverse direction for channel
-		if noInterrupt then c = noInterruptColor end
+		if channel then
+			timeLeft = duration - timeLeft
+			c = channelColor
+		end -- reverse direction for channel
+		if noInterrupt then
+			c = noInterruptColor
+		end
 		timeLeft = timeLeft - 0.02 -- fudge by about one update time for appearance's sake
-		if timeLeft < 0 then timeLeft = 0 end
+		if timeLeft < 0 then
+			timeLeft = 0
+		end
 		local s = GetFormattedText(fmt, timeLeft, duration)
 		local showLag = options and (unit == "player") and string.find(string.lower(options), "latency")
 		local lag = (showLag and (latency.lag and (latency.lag > 0))) and latency.lag or nil
 		local showX = options and string.find(string.lower(options), "interrupt")
-		if showX and noInterrupt then text = "|cFFFF0000X|r " .. text end
+		if showX and noInterrupt then
+			text = "|cFFFF0000X|r " .. text
+		end
 		return true, timeLeft, duration, s, text, icon, nil, nil, c.r, c.g, c.b, lag
 	end
 	return false
@@ -588,7 +806,10 @@ local function ValueMonitor(unit, fmt)
 	monitorTable[1] = "|cffffcc00Monitor|r"
 	monitorTable[2] = string.format("|cffffff00Frame Rate|r %d", frameRate)
 	monitorTable[3] = string.format("|cffffff00Dimensions|r %d x %d", w, h)
-	if gamma then gamma = math.floor(gamma * 100) / 100; monitorTable[4] = string.format("|cffffff00Gamma|r %0.2f", gamma) end
+	if gamma then
+		gamma = math.floor(gamma * 100) / 100
+		monitorTable[4] = string.format("|cffffff00Gamma|r %0.2f", gamma)
+	end
 	local s = GetFormattedText(fmt, frameRate, maxFPS)
 	return true, frameRate, maxFPS, nil, nil, iconFramerate, "lines", monitorTable
 end
@@ -610,7 +831,9 @@ local function ValueGold(unit, fmt)
 	local gold = math.floor(money / 10000)
 	local s = SHIM:GetCoinTextureString(money)
 	local g = SHIM:GetCoinTextureString(gold * 10000)
-	if gold <= 10 then g = s end -- only show rounded amount when get a bit of gold
+	if gold <= 10 then
+		g = s
+	end -- only show rounded amount when get a bit of gold
 	goldTable[1] = "|cffffcc00Gold|r"
 	goldTable[2] = "|cffffff00Current|r " .. s
 	local change = money - startMoney
@@ -653,8 +876,14 @@ end
 local function ValueTooltip(unit, fmt, spell, position)
 	if spell and spell ~= "" then -- make sure valid spell is provided, could be spell name, number, or #number
 		local id = nil
-		if string.find(spell, "^#%d+") then id = tonumber(string.sub(spell, 2)) else id = tonumber(spell) end
-		if not id then id = MOD:GetSpellID(spell) end
+		if string.find(spell, "^#%d+") then
+			id = tonumber(string.sub(spell, 2))
+		else
+			id = tonumber(spell)
+		end
+		if not id then
+			id = MOD:GetSpellID(spell)
+		end
 		local name, _, icon, _, _, _, spellID = SHIM:GetSpellInfo(id)
 		if name and name ~= "" then
 			local s = MOD:GetTooltipNumber("spell id", spellID, nil, tonumber(position))
@@ -677,7 +906,7 @@ local integerRange = { ["i"] = true, ["pct"] = true, ["slash"] = true }
 local numberRange = { ["i"] = true, ["f1"] = true, ["f2"] = true, ["pct"] = true, ["slash"] = true }
 
 local functionTable = {
-	[L["Absorb"]] = { func = ValueUnitAbsorb, unit = true, fmt = "pct", fmts = integerRange},
+	[L["Absorb"]] = { func = ValueUnitAbsorb, unit = true, fmt = "pct", fmts = integerRange },
 	[L["Arcane Charges"]] = { func = ValueArcaneCharges, unit = false, frequent = true, segment = true, fmts = integerRange },
 	[L["Azerite"]] = { func = ValueAzerite, unit = false, fmt = "pct", fmts = integerRange },
 	[L["Cast Bar"]] = { func = ValueCastBar, unit = true, frequent = true, comment = L["Cast bar comment"], fmt = "f1", fmts = numberRange },
@@ -697,10 +926,10 @@ local functionTable = {
 	[L["Honor"]] = { func = ValueHonor, unit = false, fmt = "pct", fmts = integerRange },
 	[L["In Combat"]] = { func = ValueCombat, unit = false, fmt = "t", fmts = onlyTime },
 	[L["Incoming Heals"]] = { func = ValueUnitIncomingHeals, unit = true, frequent = true, fmt = "pct", fmts = integerRange },
-	[L["Mail"]] = { func = ValueMail, unit = false, fmts = onlyCustom},
+	[L["Mail"]] = { func = ValueMail, unit = false, fmts = onlyCustom },
 	[L["Map X"]] = { func = ValueMapX, unit = false, fmt = "f2", fmts = numberRange },
 	[L["Map Y"]] = { func = ValueMapY, unit = false, fmt = "f2", fmts = numberRange },
-	[L["Mirror Timers"]] = { unit = false, bars = { [1] = L["Mirror Timer 3"], [2] = L["Mirror Timer 2"], [3] = L["Mirror Timer 1"] }, },
+	[L["Mirror Timers"]] = { unit = false, bars = { [1] = L["Mirror Timer 3"], [2] = L["Mirror Timer 2"], [3] = L["Mirror Timer 1"] } },
 	[L["Mirror Timer 1"]] = { func = ValueMirror1, unit = false, frequent = true, hidden = true, fmt = "t", fmts = onlyTime },
 	[L["Mirror Timer 2"]] = { func = ValueMirror2, unit = false, frequent = true, hidden = true, fmt = "t", fmts = onlyTime },
 	[L["Mirror Timer 3"]] = { func = ValueMirror3, unit = false, frequent = true, hidden = true, fmt = "t", fmts = onlyTime },
@@ -713,7 +942,7 @@ local functionTable = {
 	[L["Reputation"]] = { func = ValueReputation, unit = false, comment = L["Reputation comment"], fmt = "pct", fmts = integerRange },
 	[L["Rested"]] = { func = ValueRestedXP, unit = false, fmt = "pct", fmts = integerRange },
 	[L["Resting"]] = { func = ValueResting, unit = false, fmts = onlyCustom },
-	[L["Runes"]] = { unit = false, bars = { [1] = L["Rune 6"], [2] = L["Rune 5"], [3] = L["Rune 4"], [4] = L["Rune 3"], [5] = L["Rune 2"], [6] = L["Rune 1"] }, },
+	[L["Runes"]] = { unit = false, bars = { [1] = L["Rune 6"], [2] = L["Rune 5"], [3] = L["Rune 4"], [4] = L["Rune 3"], [5] = L["Rune 2"], [6] = L["Rune 1"] } },
 	[L["Rune 1"]] = { func = ValueRune1, unit = false, frequent = true, hidden = true, fmt = "i", fmts = numberRange },
 	[L["Rune 2"]] = { func = ValueRune2, unit = false, frequent = true, hidden = true, fmt = "i", fmts = numberRange },
 	[L["Rune 3"]] = { func = ValueRune3, unit = false, frequent = true, hidden = true, fmt = "i", fmts = numberRange },
@@ -750,8 +979,6 @@ function MOD:InitializeValues()
 	end
 	startMoney = GetMoney()
 	startTime = GetTime()
-	scanTooltip = CreateFrame("GameTooltip", "Puffin_ScanTip", nil, "GameTooltipTemplate")
-	scanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
 	mirrorIcons = { BREATH = SHIM:GetSpellTexture(5697), DEATH = SHIM:GetSpellTexture(10848), EXHAUSTION = SHIM:GetSpellTexture(9256), FEIGNDEATH = SHIM:GetSpellTexture(5384) }
 	iconXP = SHIM:GetItemIconByID(122270)
 	iconRested = SHIM:GetItemIconByID(10940)
@@ -790,50 +1017,64 @@ end
 -- Return function with a given name or nil if not found
 function MOD:GetValueFunction(name)
 	local f = valueFunctions[name]
-	if f then return f.func end
+	if f then
+		return f.func
+	end
 	return nil
 end
 
 -- Return whether a function with a given name takes unit as an argument
 function MOD:IsUnitValue(name)
 	local f = valueFunctions[name]
-	if f then return f.unit end
+	if f then
+		return f.unit
+	end
 	return nil
 end
 
 -- Return whether a function with a given name needs frequent updates
 function MOD:IsFrequentValue(name)
 	local f = valueFunctions[name]
-	if f then return f.frequent end
+	if f then
+		return f.frequent
+	end
 	return nil
 end
 
 -- Return whether a function with a given name needs segment support
 function MOD:IsSegmentValue(name)
 	local f = valueFunctions[name]
-	if f then return f.segment end
+	if f then
+		return f.segment
+	end
 	return nil
 end
 
 -- Return an optional comment for a value function
 function MOD:GetValueComment(name)
 	local f = valueFunctions[name]
-	if f then return f.comment end
+	if f then
+		return f.comment
+	end
 	return nil
 end
 
 -- Return an optional list of value bar names indirectly specified by a value
 function MOD:GetValueBars(name)
 	local f = valueFunctions[name]
-	if f then return f.bars end
+	if f then
+		return f.bars
+	end
 	return nil
 end
 
 -- Return the value's default text format and table of valid text formats
 function MOD:GetValueFormat(name)
 	local f = valueFunctions[name]
-	if f then return f.fmt or "i", f.fmts or onlyInteger end
-	return "i" , onlyInteger
+	if f then
+		return f.fmt or "i", f.fmts or onlyInteger
+	end
+	return "i", onlyInteger
 end
 
 -- Return a list of available value functions
