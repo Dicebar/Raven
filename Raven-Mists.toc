@@ -1,4 +1,4 @@
-## Interface: 50500
+## Interface: 50501
 ## Title: Raven
 ## Notes: Monitors buffs, debuffs and cooldowns and provides timer bars and icons plus helpful notifications
 ## Author: Tomber, Dicebar, Dorana
