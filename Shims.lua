@@ -192,11 +192,6 @@ do -- C_SpellBook
 	elseif _G.GetSpellBookItemName then
 		GetSpellBookItemName = _G.GetSpellBookItemName
 		function SHIM:GetSpellBookItemName(index, bookType)
-			if bookType == Enum.SpellBookSpellBank.Player then
-				bookType = "spell"
-			elseif bookType == Enum.SpellBookSpellBank.Pet then
-				bookType = "pet"
-			end
 			return GetSpellBookItemName(index, bookType)
 		end
 	end
