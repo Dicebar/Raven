@@ -9,6 +9,7 @@
 
 ## X-WoWI-ID: 18242
 ## X-Curse-Project-ID: 25068
+## X-Wago-ID: Q6aEWg6W
 
 #@no-lib-strip@
 embeds.xml
