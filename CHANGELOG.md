@@ -1,3 +1,6 @@
+# 7 October 2025
+- Resolved issue with bars render frequency.
+
 # 5 October 2025
 - Lots of cleanups
 - Fix tooltip value scanning for item

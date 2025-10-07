@@ -1369,9 +1369,9 @@ local function InitializeIcons()
 	MOD:SetIcon(L["Rune"], SHIM:GetSpellTexture(48266)) -- cached for death knight runes (this is for Frost Presence)
 end
 
--- Updates will be driven by the new timer function, compute elapsed time since last update
+-- Updates will be driven by the new timer function
 local function UpdateHandler()
-	MOD.mainLoopTicker = C_Timer.NewTicker(MOD.db.global.UpdateRate or 0.2, MOD.Update)
+	MOD.mainLoopTicker = C_Timer.NewTicker(0.033, MOD.Update)
 end
 
 -- Initialize list of units that are tracked
