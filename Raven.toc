@@ -1,4 +1,4 @@
-## Interface: 110002
+## Interface: 110200
 ## Title: Raven
 ## Notes: Monitors buffs, debuffs and cooldowns and provides timer bars and icons plus helpful notifications
 ## Author: Tomber, Dicebar, Dorana
@@ -9,6 +9,7 @@
 
 ## X-WoWI-ID: 18242
 ## X-Curse-Project-ID: 25068
+## X-Wago-ID: Q6aEWg6W
 
 #@no-lib-strip@
 embeds.xml
