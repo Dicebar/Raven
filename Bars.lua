@@ -2865,6 +2865,7 @@ local function DetectNewBuffs(unit, n, aura, isBuff, bp, vbp, bg)
 	local isMine = (tc == "player")
 	local isTabard = isMine and icon and (icon == tabardIcon) -- test if on player, same icon as equipped tabard, not cancellable
 	local isCastable = aura[17] and not isWeapon
+  local isStackable = aura[3] > 0
 	local isOther = not isStealable
 		and not isCastable
 		and not isNPC
@@ -2887,6 +2888,7 @@ local function DetectNewBuffs(unit, n, aura, isBuff, bp, vbp, bg)
 	local includeTypes = not bp.detectBuffTypes
 		or (bp.detectStealable and isStealable)
 		or (bp.detectCastable and isCastable)
+    or (bp.detectStackable and isStackable)
 		or (bp.detectNPCBuffs and isNPC)
 		or (bp.detectVehicleBuffs and isVehicle)
 		or (bp.detectBossBuffs and isBoss)
@@ -2905,6 +2907,7 @@ local function DetectNewBuffs(unit, n, aura, isBuff, bp, vbp, bg)
 		or not (
 			(bp.excludeStealable and isStealable)
 			or (bp.excludeCastable and isCastable)
+      or (bp.excludeStackable and isStackable)
 			or (bp.excludeNPCBuffs and isNPC)
 			or (bp.excludeVehicleBuffs and isVehicle)
 			or (bp.excludeBossBuffs and isBoss)
@@ -3054,6 +3057,7 @@ local function DetectNewDebuffs(unit, n, aura, isBuff, bp, vbp, bg)
 	local isEffect = (tt == "effect")
 	local isAlert = (tt == "alert")
 	local isPoison, isCurse, isMagic, isDisease = (aura[4] == "Poison"), (aura[4] == "Curse"), (aura[4] == "Magic"), (aura[4] == "Disease")
+  local isStackable = aura[3] > 0
 	local isOther = not isBoss and not isEffect and not isPoison and not isCurse and not isMagic and not isDisease and not isDispel and not isInflict and not isNPC and not isVehicle
 	local isMine = (tc == "player")
 	local id, gname = aura[20], aura[21]
@@ -3061,6 +3065,7 @@ local function DetectNewDebuffs(unit, n, aura, isBuff, bp, vbp, bg)
 	local includeTypes = not bp.filterDebuffTypes
 		or (bp.detectDispellable and isDispel)
 		or (bp.detectInflictable and isInflict)
+    or (bp.detectMultiStack and isStackable)
 		or (bp.detectNPCDebuffs and isNPC)
 		or (bp.detectVehicleDebuffs and isVehicle)
 		or (bp.detectBossDebuffs and isBoss)
@@ -3075,6 +3080,7 @@ local function DetectNewDebuffs(unit, n, aura, isBuff, bp, vbp, bg)
 		or not (
 			(bp.excludeDispellable and isDispel)
 			or (bp.excludeInflictable and isInflict)
+      or (bp.excludeMultiStack and isStackable)
 			or (bp.excludeNPCDebuffs and isNPC)
 			or (bp.excludeVehicleDebuffs and isVehicle)
 			or (bp.excludeBossDebuffs and isBoss)
