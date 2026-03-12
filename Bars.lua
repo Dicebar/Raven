@@ -237,6 +237,7 @@ MOD.BarGroupTemplate = { -- default bar group settings
 	showSolo = true,
 	showParty = true,
 	showRaid = true,
+	showRaid5 = true,
 	showCombat = true,
 	showOOC = true,
 	showStealth = true,
@@ -3377,13 +3378,15 @@ end
 -- Each condition (e.g., "in combat") is checked and if true then that condition must be enabled for the bar group
 local function CheckShow(bp)
 	local stat, pst = MOD.status, "solo"
-	if GetNumGroupMembers() > 0 then
-		if IsInRaid() then
-			pst = "raid"
-		else
-			pst = "party"
-		end
-	end
+    if GetNumGroupMembers() > 0 and IsInRaid() then
+        if GetNumGroupMembers() <= 5 then
+            pst = "raid5"
+        else
+            pst = "raid"
+        end
+    else
+        pst = "party"
+    end
 
 	if
 		InCinematic()
@@ -3391,6 +3394,7 @@ local function CheckShow(bp)
 		or (UnitOnTaxi("player") and not bp.showOnTaxi)
 		or (pst == "solo" and not bp.showSolo)
 		or (pst == "party" and not bp.showParty)
+		or (pst == "raid5" and not bp.showRaid5)
 		or (pst == "raid" and not bp.showRaid)
 		or (stat.inCombat and not bp.showCombat)
 		or (not stat.inCombat and not bp.showOOC)

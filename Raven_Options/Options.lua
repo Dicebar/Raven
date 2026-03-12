@@ -6587,9 +6587,9 @@ MOD.OptionsTable = {
 								ShowInRaid = {
 									type = "toggle",
 									order = 11,
-									name = L["In Raid"],
+									name = L["In Raid > 5"],
 									width = "half",
-									desc = L["Show spell alerts when player is in a raid group."],
+									desc = L["Show spell alerts when player is in a raid group with greater than 5 members."],
 									get = function(info)
 										return MOD.db.global.SpellAlerts.showRaid
 									end,
@@ -6597,9 +6597,22 @@ MOD.OptionsTable = {
 										MOD.db.global.SpellAlerts.showRaid = value
 									end,
 								},
-								ShowInParty = {
+								ShowInRaid5 = {
 									type = "toggle",
 									order = 12,
+									name = L["In Raid <= 5"],
+									width = "half",
+									desc = L["Show spell alerts when player is in a raid group with 5 members or less."],
+									get = function(info)
+										return MOD.db.global.SpellAlerts.showRaid5
+									end,
+									set = function(info, value)
+										MOD.db.global.SpellAlerts.showRaid5 = value
+									end,
+								},
+								ShowInParty = {
+									type = "toggle",
+									order = 13,
 									name = L["In Party"],
 									width = "half",
 									desc = L["Show spell alerts when player is in a party."],
@@ -6612,7 +6625,7 @@ MOD.OptionsTable = {
 								},
 								ShowSolo = {
 									type = "toggle",
-									order = 13,
+									order = 14,
 									name = L["Solo"],
 									width = "half",
 									desc = L["Show spell alerts when playing solo."],
@@ -6625,7 +6638,7 @@ MOD.OptionsTable = {
 								},
 								ShowNotInInstance = {
 									type = "toggle",
-									order = 14,
+									order = 15,
 									name = L["Not In Instance"],
 									desc = L["Show spell alerts when player is not in an instance."],
 									get = function(info)
@@ -9856,8 +9869,8 @@ MOD.OptionsTable = {
 								RaidGroup = {
 									type = "toggle",
 									order = 32,
-									name = L["In Raid"],
-									desc = L["If checked, bar group is shown when the player is in a raid."],
+									name = L["In Raid > 5"],
+									desc = L["If checked, bar group is shown when the player is in a raid with greater than 5 members."],
 									get = function(info)
 										return GetBarGroupField("showRaid")
 									end,
@@ -9865,9 +9878,21 @@ MOD.OptionsTable = {
 										SetBarGroupField("showRaid", value)
 									end,
 								},
-								BattlegroundGroup = {
+								RaidGroup5 = {
 									type = "toggle",
 									order = 33,
+									name = L["In Raid <= 5"],
+									desc = L["If checked, bar group is shown when the player is in a raid with 5 members or less."],
+									get = function(info)
+										return GetBarGroupField("showRaid5")
+									end,
+									set = function(info, value)
+										SetBarGroupField("showRaid5", value)
+									end,
+								},
+								BattlegroundGroup = {
+									type = "toggle",
+									order = 34,
 									name = L["In Battleground"],
 									desc = L["If checked, bar group is shown when the player is in a battleground."],
 									get = function(info)
@@ -9879,7 +9904,7 @@ MOD.OptionsTable = {
 								},
 								InstanceGroup = {
 									type = "toggle",
-									order = 34,
+									order = 35,
 									name = L["In Instance"],
 									desc = L["If checked, bar group is shown when the player is in a 5-man or raid instance."],
 									get = function(info)
@@ -9891,7 +9916,7 @@ MOD.OptionsTable = {
 								},
 								NotInstanceGroup = {
 									type = "toggle",
-									order = 35,
+									order = 36,
 									name = L["Not In Instance"],
 									desc = L["If checked, bar group is shown when the player is not in a 5-man or raid instance."],
 									get = function(info)
@@ -9903,7 +9928,7 @@ MOD.OptionsTable = {
 								},
 								ArenaGroup = {
 									type = "toggle",
-									order = 36,
+									order = 37,
 									name = L["In Arena"],
 									desc = L["If checked, bar group is shown when the player is in an arena."],
 									get = function(info)
@@ -9915,7 +9940,7 @@ MOD.OptionsTable = {
 								},
 								PetBattleGroup = {
 									type = "toggle",
-									order = 37,
+									order = 38,
 									name = L["In Pet Battle"],
 									desc = L["If checked, bar group is shown when the player is in a pet battle."],
 									get = function(info)
